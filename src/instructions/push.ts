@@ -1,5 +1,5 @@
 import {VmState} from '../vm-state';
 
-export function push(vmState: VmState) {
-	vmState.stack.push(vmState.nextInstruction());
+export function push(vmState: VmState): void {
+  vmState.stack.push(vmState.nextInstruction());
 }
