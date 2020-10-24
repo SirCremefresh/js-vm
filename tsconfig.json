@@ -6,7 +6,7 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "sourceMap": true,
-    "outDir": "dist",
+    "outDir": "dist/tsc",
     "forceConsistentCasingInFileNames": true
   },
   "lib": ["ES2020"]

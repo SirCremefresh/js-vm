@@ -31,7 +31,7 @@ export const InstructionMap = {
   [Instruction.INSTRUCTION_JMP]: jmp,
   [Instruction.INSTRUCTION_JLE]: jle,
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-unused-vars
-  [Instruction.INSTRUCTION_NOP]: (_: VmState) => null,
+  [Instruction.INSTRUCTION_NOP]: function (_: VmState){ return null; },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-unused-vars
-  [Instruction.INSTRUCTION_LABEL]: (_: VmState) => null,
+  [Instruction.INSTRUCTION_LABEL]: function (_: VmState){ return null; },
 };

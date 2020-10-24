@@ -5,7 +5,9 @@ import {Vm} from './vm';
 //
 // [:|] mit inc instruction
 // [:)]
-console.time("vm_test");
+if (process.env.NODE_ENV !== 'production') {
+  console.time('vm_test');
+}
 const vm = new Vm([
   Instruction.INSTRUCTION_PUSH, 1_000_000_000,
   Instruction.INSTRUCTION_LOAD, Register.D,
@@ -36,5 +38,6 @@ const vm = new Vm([
 // ]);
 
 vm.run();
-
-console.timeLog("vm_test");
+if (process.env.NODE_ENV !== 'production') {
+  console.timeLog('vm_test');
+}
