@@ -4,7 +4,7 @@ import {VmState} from './vm-state';
 export class Vm {
   private readonly vmState: VmState;
 
-  constructor(instructions: number[]) {
+  constructor(instructions: Int32Array) {
     this.vmState = new VmState(instructions);
   }
 
