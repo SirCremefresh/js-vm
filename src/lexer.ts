@@ -1,5 +1,7 @@
-/*
-const programText2 = `
+type TokenElement = { token: Token, startIndex: number, endIndex: number };
+type TokenStreamCtx = { startIndex: number, state: Token, tokenStream: TokenElement[] };
+
+const programText = `//hello world program
 push 100000 // asdf
 load %rd // asdfg
 log %rd
@@ -9,30 +11,7 @@ inc %rc, 1
 jl my-label
 
 halt`;
-*/
 
-// const programText2 = `//hello world`;
-
-type TokenElement = { token: Token, startIndex: number, endIndex: number };
-type TokenStreamCtx = { startIndex: number, state: Token, tokenStream: TokenElement[] };
-
-const programText23 = `push %ra
-asfdas:
-load %ra`;
-const programText32 = `push 100000`;
-const programText = `add 100000, 100000, %ra, %ra`;
-const programText2 = `add 100000, %ra`;
-
-const programText4 = `main:\n\n\n`;
-
-const lines = programText
-  .split('\n')
-  .map(line => line.trim())
-  .filter(line => line.length > 0);
-
-
-//const instructionText = "push 369";
-//const instructionText = 'push369';
 
 const enum Token {
 
@@ -47,37 +26,9 @@ const enum Token {
   TOKEN_WHITESPACE = 'TOKEN_WHITESPACE',
   TOKEN_COMMA = 'TOKEN_COMMA',
   TOKEN_NEWLINE = 'TOKEN_NEWLINE',
-  TOKEN_CHARACTER = 'TOKEN_CHARACTER',
-  TOKEN_NUMBER = 'TOKEN_NUMBER',
   TOKEN_COMMENT = 'TOKEN_COMMENT',
   TOKEN_INVALID = 'TOKEN_INVALID',
 }
-
-// const instructionTokens = [Token.TOKEN_CHARACTER, Token.TOKEN_CONST];
-
-// [
-// {token: Token.TOKEN_INSTRUCTION, startIndex: 0, endIndex: 3},
-// {token: Token.TOKEN_WHITESPACE, value: ' '},
-// {token: Token.TOKEN_CONST, value: '369'}
-// ];
-// const instructionTokens = [Token.TOKEN_INSTRUCTION, Token.TOKEN_CONST];
-
-// const tokenStream = [];
-
-// for (const line of lines) {
-//   const [instruction, ...argList] = line.split(' ');
-//   const args = (argList.length > 0) ? argList.join('').split(',') : [];
-//   console.log({instruction, args});
-// }
-
-//INSTRUCTION-WHITESPACE-*{TOKEN_REGISTER/TOKEN_STACK/TOKEN_CONST}
-//{INSTRUCTION/LABEL}-WHITESPACE-*{TOKEN_REGISTER/TOKEN_STACK/TOKEN_CONST}
-//  INSTRUCTION-{:,WHITESPACE}-{TOKEN_REGISTER/TOKEN_STACK/TOKEN_CONST}{,/\n}
-
-
-// let startIndex = 0;
-// let state: Token = Token.TOKEN_INSTRUCTION;
-// const tokenStream: TokenStreamItem[] = [];
 
 
 function setToken(ctx: TokenStreamCtx, index: number, endIndexDelta = -1) {
@@ -89,10 +40,7 @@ function setToken(ctx: TokenStreamCtx, index: number, endIndexDelta = -1) {
   ctx.startIndex = index;
 }
 
-//INSTRUCTION-WHITESPACE-TOKEN_CONST
-//LABEL
-
-function lexThat(programText: string) {
+function getTokenStream(programText: string): TokenElement[] {
   programText = programText + '\n';
   const programCharacters = programText.split('');
   const context: TokenStreamCtx = {
@@ -143,7 +91,7 @@ function lexThat(programText: string) {
         context.state = Token.TOKEN_INVALID;
         break;
       }
-      while (programCharacters[index] !== '\n'){
+      while (programCharacters[index] !== '\n') {
         index++;
       }
       context.state = Token.TOKEN_COMMENT;
@@ -157,30 +105,14 @@ function lexThat(programText: string) {
     }
   }
 
-  console.log(context.tokenStream.map(tokenElement => ({
-    ...tokenElement,
-    code: programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1)
-  })));
-  console.log(programText.length);
-  console.log(context.tokenStream[context.tokenStream.length - 1].endIndex - programText.length == -1 ? 'passed' : 'failed');
-
-  // let result  ='';
-  // for (const tokenElement of context.tokenStream) {
-  //   result += programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1);
-  // }
-  //
-  // for (let index = 0; index < result.length; ++index) {
-  //   if (result[index] !== programText[index]) {
-  //     console.log(`Error. index: ${index}, `);
-  //   }
-  // }
-  // console.log('--');
-  //
-  // console.log(result);
-  // console.log('--');
-  //
-  // console.log(programText);
-  // console.log('--');
+  return context.tokenStream;
 }
 
-lexThat(programText2);
+const tokenStream = getTokenStream(programText);
+
+console.log(tokenStream.map(tokenElement => ({
+  ...tokenElement,
+  code: programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1)
+})));
+console.log(programText.length);
+console.log(tokenStream[tokenStream.length - 1].endIndex - programText.length == 0 ? 'passed' : 'failed');
