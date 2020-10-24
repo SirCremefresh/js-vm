@@ -1,16 +1,18 @@
-// const programText = `
-// push 100000
-// load %rd
-// log %rd
-// my-label:
-// inc %rc, 1
-// jl my-label
-// halt
-// `;
+const programText2 = `
+push 100000
+load %rd
+log %rd
+
+my-label:
+inc %rc, 1
+jl my-label
+
+halt`;
+
 type TokenElement = { token: Token, startIndex: number, endIndex: number };
 type TokenStreamCtx = { startIndex: number, state: Token, tokenStream: TokenElement[] };
 
-const programText2 = `push %ra
+const programText23 = `push %ra
 asfdas:
 load %ra`;
 const programText1 = `push 100000`;
@@ -106,7 +108,9 @@ function lexThat(programText: string) {
       context.state = Token.TOKEN_LABEL;
       break;
     case '\n':
-      setToken(context, index);
+      if(context.startIndex !== index){
+        setToken(context, index);
+      }
 
       context.state = Token.TOKEN_NEWLINE;
       setToken(context, index, 0);
