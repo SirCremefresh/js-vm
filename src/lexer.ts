@@ -10,9 +10,11 @@
 type TokenElement = { token: Token, startIndex: number, endIndex: number };
 type TokenStreamCtx = { startIndex: number, state: Token, tokenStream: TokenElement[] };
 
-const programText = `push %ra`;
+const programText2 = `push %ra
+asfdas:
+load %ra`;
 const programText1 = `push 100000`;
-const programText2 = `add 100000, 100000, %ra, %ra`;
+const programText = `add 100000, 100000, %ra, %ra`;
 const programText3 = `add 100000, %ra`;
 
 const programText4 = `main:\n\n\n`;
@@ -101,14 +103,11 @@ function lexThat(programText: string) {
       context.state = Token.TOKEN_WHITESPACE;
       break;
     case ':' :
-      if (context.state === Token.TOKEN_INSTRUCTION) {
-        setToken(context, index);
-      }
+      context.state = Token.TOKEN_LABEL;
       break;
     case '\n':
-      if (context.state === Token.TOKEN_CONST || context.state === Token.TOKEN_REGISTER) {
-        setToken(context, index);
-      }
+      setToken(context, index);
+
       context.state = Token.TOKEN_NEWLINE;
       setToken(context, index, 0);
 
@@ -122,10 +121,8 @@ function lexThat(programText: string) {
       }
       break;
     case ',':
-      if (context.state === Token.TOKEN_CONST || context.state === Token.TOKEN_REGISTER) {
-        setToken(context, index);
-        context.state = Token.TOKEN_COMMA;
-      }
+      setToken(context, index);
+      context.state = Token.TOKEN_COMMA;
       break;
     default:
       if (context.state === Token.TOKEN_WHITESPACE) {
