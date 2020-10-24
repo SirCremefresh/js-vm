@@ -5,7 +5,7 @@ import {Vm} from './vm';
 console.time('vm_test');
 
 const vm = new Vm(Int32Array.from([
-  Instruction.INSTRUCTION_PUSH, 1_000_000_000,
+  Instruction.INSTRUCTION_PUSH, 1_000_000,
   Instruction.INSTRUCTION_LOAD, Register.D,
   Instruction.INSTRUCTION_LOG, Register.D,
   Instruction.INSTRUCTION_LABEL,
@@ -15,5 +15,5 @@ const vm = new Vm(Int32Array.from([
 ]));
 
 vm.run();
-
+console.log(JSON.stringify(vm.vmState));
 console.timeLog('vm_test');
