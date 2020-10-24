@@ -14,7 +14,6 @@ halt`;
 
 
 const enum Token {
-
   //MEMORY
   TOKEN_REGISTER = 'TOKEN_REGISTER',
   TOKEN_STACK = 'TOKEN_STACK',
@@ -41,7 +40,6 @@ function setToken(ctx: TokenStreamCtx, index: number, endIndexDelta = -1) {
 }
 
 function getTokenStream(programText: string): TokenElement[] {
-  programText = programText + '\n';
   const programCharacters = programText.split('');
   const context: TokenStreamCtx = {
     startIndex: 0,
@@ -104,6 +102,7 @@ function getTokenStream(programText: string): TokenElement[] {
       }
     }
   }
+  setToken(context, programCharacters.length - 1, 0);
 
   return context.tokenStream;
 }
@@ -115,4 +114,4 @@ console.log(tokenStream.map(tokenElement => ({
   code: programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1)
 })));
 console.log(programText.length);
-console.log(tokenStream[tokenStream.length - 1].endIndex - programText.length == 0 ? 'passed' : 'failed');
+console.log(tokenStream[tokenStream.length - 1].endIndex - programText.length == -1 ? 'passed' : 'failed');
