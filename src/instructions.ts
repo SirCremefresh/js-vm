@@ -8,7 +8,7 @@ import {log} from './instructions/log';
 import {push} from './instructions/push';
 import {VmState} from './vm-state';
 
-export enum Instruction {
+export const enum Instruction {
 	INSTRUCTION_HALT,
 	INSTRUCTION_PUSH,
 	INSTRUCTION_LOG,
@@ -22,14 +22,16 @@ export enum Instruction {
 }
 
 export const InstructionMap = {
-	[Instruction.INSTRUCTION_HALT]: halt,
-	[Instruction.INSTRUCTION_PUSH]: push,
-	[Instruction.INSTRUCTION_LOG]: log,
-	[Instruction.INSTRUCTION_ADD]: add,
-	[Instruction.INSTRUCTION_LOAD]: load,
-	[Instruction.INSTRUCTION_INC]: inc,
-	[Instruction.INSTRUCTION_JMP]: jmp,
-	[Instruction.INSTRUCTION_JLE]: jle,
-	[Instruction.INSTRUCTION_NOP]: (_: VmState) => null,
-	[Instruction.INSTRUCTION_LABEL]: (_: VmState) => null,
+  [Instruction.INSTRUCTION_HALT]: halt,
+  [Instruction.INSTRUCTION_PUSH]: push,
+  [Instruction.INSTRUCTION_LOG]: log,
+  [Instruction.INSTRUCTION_ADD]: add,
+  [Instruction.INSTRUCTION_LOAD]: load,
+  [Instruction.INSTRUCTION_INC]: inc,
+  [Instruction.INSTRUCTION_JMP]: jmp,
+  [Instruction.INSTRUCTION_JLE]: jle,
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-unused-vars
+  [Instruction.INSTRUCTION_NOP]: (_: VmState) => null,
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-unused-vars
+  [Instruction.INSTRUCTION_LABEL]: (_: VmState) => null,
 };

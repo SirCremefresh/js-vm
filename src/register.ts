@@ -1,6 +1,6 @@
-export enum Register {
-	A,
-	B,
-	C,
-	D
+export const enum Register {
+  A,
+  B,
+  C,
+  D
 }
