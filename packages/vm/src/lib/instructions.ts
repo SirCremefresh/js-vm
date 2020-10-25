@@ -1,13 +1,13 @@
-import {add} from './instructions/add';
-import {halt} from './instructions/halt';
-import {inc} from './instructions/inc';
-import {jl} from './instructions/jl';
-import {jle} from './instructions/jle';
-import {jmp} from './instructions/jmp';
-import {load} from './instructions/load';
-import {log} from './instructions/log';
-import {push} from './instructions/push';
-import {VmState} from './vm-state';
+import { add } from './instructions/add';
+import { halt } from './instructions/halt';
+import { inc } from './instructions/inc';
+import { jl } from './instructions/jl';
+import { jle } from './instructions/jle';
+import { jmp } from './instructions/jmp';
+import { load } from './instructions/load';
+import { log } from './instructions/log';
+import { push } from './instructions/push';
+import { VmState } from './vm-state';
 
 export const enum Instruction {
   INSTRUCTION_HALT,

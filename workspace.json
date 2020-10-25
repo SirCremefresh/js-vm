@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "projects": {
+    "vm": {
+      "root": "packages/vm",
+      "sourceRoot": "packages/vm/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["packages/vm/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "packages/vm/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "lexer": {
+      "root": "packages/lexer",
+      "sourceRoot": "packages/lexer/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["packages/lexer/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "packages/lexer/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "sample-programms": {
+      "root": "packages/sample-programms",
+      "sourceRoot": "packages/sample-programms/src",
+      "projectType": "application",
+      "prefix": "sample-programms",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/packages/sample-programms",
+            "main": "packages/sample-programms/src/main.ts",
+            "tsConfig": "packages/sample-programms/tsconfig.app.json",
+            "assets": ["packages/sample-programms/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "packages/sample-programms/src/environments/environment.ts",
+                  "with": "packages/sample-programms/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "sample-programms:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["packages/sample-programms/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "packages/sample-programms/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/node"
+  },
+  "defaultProject": "sample-programms"
+}

@@ -41,7 +41,7 @@ function setToken(ctx: TokenStreamCtx, index: number, endIndexDelta = -1) {
   ctx.startIndex = index;
 }
 
-function getTokenStream(programText: string): TokenElement[] {
+export function getTokenStream(programText: string): TokenElement[] {
   const programCharacters = programText.split('');
   const context: TokenStreamCtx = {
     startIndex: 0,

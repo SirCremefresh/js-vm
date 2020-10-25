@@ -1,6 +1,4 @@
-import {VmState} from '../vm-state';
+import { VmState } from '../vm-state';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function halt(vmState: VmState): void {
-  console.log('halt');
-}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-empty-function
+export function halt(vmState: VmState): void {}

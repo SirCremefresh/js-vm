@@ -1,5 +1,5 @@
-import {assert} from '../assert';
-import {VmState} from '../vm-state';
+import { assert } from '../assert';
+import { VmState } from '../vm-state';
 
 export function load(vmState: VmState): void {
   const stackValue = vmState.stack.pop() as number;
