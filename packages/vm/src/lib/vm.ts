@@ -1,4 +1,5 @@
-import { Instruction, InstructionMap } from './instructions';
+import { Instruction } from './instruction';
+import { InstructionMap } from './instruction-map';
 import { VmState } from './vm-state';
 
 export class Vm {

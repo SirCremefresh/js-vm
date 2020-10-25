@@ -56,7 +56,7 @@
             "outputPath": "dist/packages/sample-programms",
             "main": "packages/sample-programms/src/main.ts",
             "tsConfig": "packages/sample-programms/tsconfig.app.json",
-            "assets": ["packages/sample-programms/src/assets"]
+            "assets": []
           },
           "configurations": {
             "production": {

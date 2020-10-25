@@ -1,6 +1,6 @@
-import { assert } from '../assert';
-import { Instruction } from '../instructions';
 import { VmState } from '../vm-state';
+import { assert } from '../assert';
+import { Instruction } from '../instruction';
 
 export function jmp(vmState: VmState): void {
   const instruction = vmState.nextInstruction();

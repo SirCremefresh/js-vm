@@ -1,5 +1,4 @@
-import { Instruction } from './instructions';
-import { Register } from './register';
+import { Instruction } from './instruction';
 import { Vm } from './vm';
 
 describe('vm', () => {
@@ -8,14 +7,6 @@ describe('vm', () => {
       Int32Array.from([
         Instruction.INSTRUCTION_PUSH,
         1_000,
-        Instruction.INSTRUCTION_LOAD,
-        Register.D,
-        Instruction.INSTRUCTION_LABEL,
-        Instruction.INSTRUCTION_INC,
-        Register.C,
-        1,
-        Instruction.INSTRUCTION_JL,
-        6,
         Instruction.INSTRUCTION_HALT,
       ])
     );

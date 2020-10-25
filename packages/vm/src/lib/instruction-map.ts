@@ -1,3 +1,5 @@
+import { VmState } from '@js-vm/vm';
+import { Instruction } from './instruction';
 import { add } from './instructions/add';
 import { halt } from './instructions/halt';
 import { inc } from './instructions/inc';
@@ -7,21 +9,6 @@ import { jmp } from './instructions/jmp';
 import { load } from './instructions/load';
 import { log } from './instructions/log';
 import { push } from './instructions/push';
-import { VmState } from './vm-state';
-
-export const enum Instruction {
-  INSTRUCTION_HALT,
-  INSTRUCTION_PUSH,
-  INSTRUCTION_LOG,
-  INSTRUCTION_ADD,
-  INSTRUCTION_LOAD,
-  INSTRUCTION_INC,
-  INSTRUCTION_JMP,
-  INSTRUCTION_JLE,
-  INSTRUCTION_JL,
-  INSTRUCTION_LABEL,
-  INSTRUCTION_NOP,
-}
 
 export const InstructionMap = {
   [Instruction.INSTRUCTION_HALT]: halt,
