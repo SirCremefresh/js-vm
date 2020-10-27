@@ -1,30 +1,40 @@
 import {terser} from 'rollup-plugin-terser';
 import replace from '@rollup/plugin-replace';
 
-export default {
-  input: 'dist/tsc/app/sample-programm/index.js',
+const globalPlugins =  [
+  replace({
+    'process.env.NODE_ENV': JSON.stringify('production'),
+  })
+];
+
+const terserPlugin = terser({
+  ecma: 2020,
+  compress: true,
+  module: true,
+  mangle: true
+})
+
+const projects = [
+  'sample-lexer-program',
+  'sample-vm-program'
+].map(projectName => ({
+  input: `dist/tsc/app/${projectName}/index.js`,
   output: [
     {
-      file: 'dist/sample-programm.pretty.js',
+      file: `dist/${projectName}.pretty.js`,
+      name: 'create_single_file',
       format: 'es',
     },
     {
-      file: 'dist/sample-programm.js',
+      file: `dist/${projectName}.js`,
       format: 'es',
-      name: 'version',
+      name: 'optimize',
       plugins: [
-        terser({
-          ecma: 2020,
-          compress: true,
-          module: true,
-          mangle: true
-        })
+        terserPlugin
       ]
     }
   ],
-  plugins: [
-    replace({
-      'process.env.NODE_ENV': JSON.stringify('production'),
-    })
-  ]
-};
+  plugins: globalPlugins
+}))
+
+export default [...projects];
