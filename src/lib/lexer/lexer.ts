@@ -1,17 +1,5 @@
-type TokenElement = { token: Token, startIndex: number, endIndex: number };
+export type TokenElement = { token: Token, startIndex: number, endIndex: number };
 type TokenStreamCtx = { startIndex: number, state: Token, tokenStream: TokenElement[] };
-
-const programText = `//hello world program
-push 100000 // asdf
-load %rd // asdfg
-log %rd
-
-my-label:
-inc %rc, 1
-jl my-label
-
-halt`;
-
 
 const enum Token {
   //MEMORY
@@ -39,7 +27,7 @@ function setToken(ctx: TokenStreamCtx, index: number, endIndexDelta = -1) {
   ctx.startIndex = index;
 }
 
-function getTokenStream(programText: string): TokenElement[] {
+export function getTokenStream(programText: string): TokenElement[] {
   const programCharacters = programText.split('');
   const context: TokenStreamCtx = {
     startIndex: 0,
@@ -106,12 +94,3 @@ function getTokenStream(programText: string): TokenElement[] {
 
   return context.tokenStream;
 }
-
-const tokenStream = getTokenStream(programText);
-
-console.log(tokenStream.map(tokenElement => ({
-  ...tokenElement,
-  code: programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1)
-})));
-console.log(programText.length);
-console.log(tokenStream[tokenStream.length - 1].endIndex - programText.length == -1 ? 'passed' : 'failed');

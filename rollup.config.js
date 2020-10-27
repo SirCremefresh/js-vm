@@ -2,14 +2,14 @@ import {terser} from 'rollup-plugin-terser';
 import replace from '@rollup/plugin-replace';
 
 export default {
-  input: 'dist/tsc/index.js',
+  input: 'dist/tsc/app/sample-programm/index.js',
   output: [
     {
-      file: 'dist/index.pretty.js',
+      file: 'dist/sample-programm.pretty.js',
       format: 'es',
     },
     {
-      file: 'dist/index.js',
+      file: 'dist/sample-programm.js',
       format: 'es',
       name: 'version',
       plugins: [
