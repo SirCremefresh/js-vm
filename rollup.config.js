@@ -1,5 +1,6 @@
 import {terser} from 'rollup-plugin-terser';
 import replace from '@rollup/plugin-replace';
+import copy from 'rollup-plugin-copy'
 
 const globalPlugins =  [
   replace({
@@ -15,18 +16,18 @@ const terserPlugin = terser({
 })
 
 const projects = [
-  'sample-lexer-program',
-  'sample-vm-program'
-].map(projectName => ({
+  {projectName: 'sample-lexer-program', copyPublic: true},
+  {projectName: 'sample-vm-program', copyPublic: false}
+].map(({projectName, copyPublic}) => ({
   input: `dist/tsc/app/${projectName}/index.js`,
   output: [
     {
-      file: `dist/${projectName}.pretty.js`,
+      file: `dist/${projectName}/index.pretty.js`,
       name: 'create_single_file',
       format: 'es',
     },
     {
-      file: `dist/${projectName}.js`,
+      file: `dist/${projectName}/index.js`,
       format: 'es',
       name: 'optimize',
       plugins: [
@@ -34,7 +35,16 @@ const projects = [
       ]
     }
   ],
-  plugins: globalPlugins
+  plugins: [
+    ...globalPlugins,  
+    ...(copyPublic ? [
+      copy({
+        targets: [
+          { src: `src/app/${projectName}/public/*`, dest: `dist/${projectName}/` }
+        ]
+      })
+    ]:[])
+  ]
 }))
 
 export default [...projects];
