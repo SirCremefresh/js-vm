@@ -1,3 +1,62 @@
-<html>
-    <script src="./index.js"></script>
+<!doctype html>
+<html lang="en">
+<header>
+  <script src="./index.js"></script>
+  <style>
+      .editor {
+          background: darkslategrey;
+          display: grid;
+          grid-template-columns: auto 1fr;
+      }
+
+      .editor .line-number {
+          padding-right: 1rem;
+          color: azure;
+      }
+
+      .editor .keyword {
+          color: chocolate;
+      }
+
+      .editor .registry {
+          color: lightblue;
+      }
+
+      .editor .const {
+          color: wheat;
+      }
+  </style>
+</header>
+<body>
+<div class="editor" id="editor">
+  <span class="line-number">1: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+  <span class="line-number">2: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+  <span class="line-number">3: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+  <span class="line-number">4: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+</div>
+</body>
 </html>

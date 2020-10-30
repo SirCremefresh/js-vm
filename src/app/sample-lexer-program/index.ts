@@ -1,9 +1,14 @@
-import {getTokenStream} from '../../lib/lexer/index'
+import {getTokenStream} from '../../lib/lexer/index';
+
+const e = document.getElementById('editor');
+
+console.log(e);
 
 const programText = `//hello world program
 push 100000 // asdf
 load %rd // asdfg
 log %rd
+
 
 my-label:
 inc %rc, 1
