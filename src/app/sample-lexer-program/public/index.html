@@ -1,12 +1,15 @@
 <!doctype html>
 <html lang="en">
-<header>
+<head>
   <script src="./index.js"></script>
+  <link rel="stylesheet" href="./jetbrains-mono.css">
   <style>
       .editor {
           background: darkslategrey;
           display: grid;
           grid-template-columns: auto 1fr;
+
+          font-family: 'JetBrains Mono', 'sans-serif';
       }
 
       .editor .line-number {
@@ -25,13 +28,29 @@
       .editor .const {
           color: wheat;
       }
+
+      .editor .cursor {
+          color: mintcream;
+          position: absolute;
+          animation: 1s blink step-end infinite;
+      }
+
+      @keyframes blink {
+          from, to {
+              color: transparent;
+          }
+          50% {
+              color: mintcream;
+          }
+      }
+
   </style>
-</header>
+</head>
 <body>
 <div class="editor" id="editor">
   <span class="line-number">1: </span>
   <div class="line">
-    <span class="keyword">add</span>
+    <span class="keyword">ab<span class="cursor">|</span>cd</span>
     <span class="registry">%a</span>
     <span class="const">32</span>
     <span class="registry">%a</span>

@@ -1,8 +1,24 @@
-import {getTokenStream} from '../../lib/lexer/index';
+import { getTokenStream } from '../../lib/lexer/index';
 
-const e = document.getElementById('editor');
+function onDomReady(fn: () => void) {
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(fn, 1);
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
 
-console.log(e);
+onDomReady(() => {
+  const editor = document.getElementById('editor');
+
+  if (editor != null) {
+    editor.onclick = e => console.log(e);
+    console.log('added listener');
+  }
+  console.log('after');
+});
+
+
 
 const programText = `//hello world program
 push 100000 // asdf
