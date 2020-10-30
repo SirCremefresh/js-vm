@@ -12,10 +12,34 @@ onDomReady(() => {
   const editor = document.getElementById('editor');
 
   if (editor != null) {
-    editor.onclick = e => console.log(e);
+    // editor.onclick = e => console.log(e);
+
+    let clean: any, cursor: any;
+    editor.addEventListener('click', e => {
+      const position = window.getSelection()?.focusOffset;
+      if (position === undefined) {
+        console.log('could not get position');
+        return null;
+      }
+      console.log(e.target);
+      console.log(position);
+      console.log(e);
+      // if (cursor && position > cursor)
+      //   position--;
+      // if (clean)
+      //   editor['innerText'] = clean;
+      // const textnode = (editor.firstChild['splitText'] as any)(position);
+      // clean = textnode.wholeText;
+      // cursor = position;
+      // editor.insertBefore(document.createTextNode('|'), textnode);
+      // editor['innerText'] = textnode.wholeText;
+    });
     console.log('added listener');
   }
   console.log('after');
+
+
+
 });
 
 
