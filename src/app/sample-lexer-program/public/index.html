@@ -9,7 +9,11 @@
           display: grid;
           grid-template-columns: auto 1fr;
 
+          -webkit-font-feature-settings: "liga" on, "calt" on;
+          -webkit-font-smoothing: antialiased;
+          text-rendering: optimizeLegibility;
           font-family: 'JetBrains Mono', 'sans-serif';
+          font-size: 1em;
       }
 
       .editor .line-number {
@@ -31,7 +35,10 @@
 
       .editor .cursor {
           color: mintcream;
-          position: absolute;
+          position: relative;
+          width: 0;
+          text-align: left;
+          left: 30px;
           animation: 1s blink step-end infinite;
       }
 
@@ -48,9 +55,9 @@
 </head>
 <body>
 <div class="editor" id="editor">
-  <span class="line-number">1: </span>
+  <span class="line-number">1:<span class="cursor">|</span></span>
   <div class="line">
-    <span class="keyword">ab<span class="cursor">|</span>cd</span>
+    <span class="keyword">add</span>
     <span class="registry">%a</span>
     <span class="const">32</span>
     <span class="registry">%a</span>
