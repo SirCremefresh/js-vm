@@ -5,16 +5,22 @@
   <script src="./index.js"></script>
   <link rel="stylesheet" href="./jetbrains-mono.css">
   <style>
-      .editor {
-          background: darkslategrey;
-          display: grid;
-          grid-template-columns: auto 1fr;
+      :root {
+          --editor-font-size: 10px;
+      }
 
+      .mono-font {
           -webkit-font-feature-settings: "liga" on, "calt" on;
           -webkit-font-smoothing: antialiased;
           text-rendering: optimizeLegibility;
           font-family: 'JetBrains Mono', 'sans-serif';
-          font-size: 10px;
+          font-size: var(--editor-font-size);
+      }
+
+      .editor {
+          background: darkslategrey;
+          display: grid;
+          grid-template-columns: auto 1fr;
       }
 
       .editor .line-number {
@@ -34,9 +40,9 @@
           color: wheat;
       }
 
-      .editor .cursor {
+      .cursor {
           color: mintcream;
-          position: relative;
+          position: absolute;
           width: 0;
           text-align: left;
           left: 0px;
@@ -54,11 +60,13 @@
 
   </style>
 </head>
+<span class="cursor mono-font">|</span>
 <body>
-<div class="editor" id="editor">
-  <span class="line-number">1:<span class="cursor">|</span></span>
+<div class="editor mono-font" id="editor">
+  <span class="line-number">1:</span>
   <div class="line">
-    <span class="keyword">add</span><span class="space">&nbsp;</span><span class="registry">%a</span><span class="space">&nbsp;</span><span class="const">32</span><span class="space">&nbsp;</span><span class="registry">%a</span>
+    <span class="keyword">add</span><span class="space">&nbsp;</span><span class="registry">%a</span><span
+    class="space">&nbsp;</span><span class="const">32</span><span class="space">&nbsp;</span><span class="registry">%adddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd</span>
   </div>
   <span class="line-number">2: </span>
   <div class="line">
@@ -68,6 +76,76 @@
     <span class="registry">%a</span>
   </div>
   <span class="line-number">3: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+  <span class="line-number">4: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+  <span class="line-number">4: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+  <span class="line-number">4: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+  <span class="line-number">4: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+  <span class="line-number">4: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+  <span class="line-number">4: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+  <span class="line-number">4: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+  <span class="line-number">4: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+  <span class="line-number">4: </span>
+  <div class="line">
+    <span class="keyword">add</span>
+    <span class="registry">%a</span>
+    <span class="const">32</span>
+    <span class="registry">%a</span>
+  </div>
+  <span class="line-number">4: </span>
   <div class="line">
     <span class="keyword">add</span>
     <span class="registry">%a</span>
