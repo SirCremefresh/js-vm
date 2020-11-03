@@ -1,10 +1,10 @@
-import {terser} from 'rollup-plugin-terser';
+import { terser } from 'rollup-plugin-terser';
 import replace from '@rollup/plugin-replace';
 import copy from 'rollup-plugin-copy';
 
-const globalPlugins =  [
+const globalPlugins = [
   replace({
-    'process.env.NODE_ENV': JSON.stringify('production'),
+    'process.env.NODE_ENV': JSON.stringify('production')
   })
 ];
 
@@ -16,15 +16,20 @@ const terserPlugin = terser({
 });
 
 const projects = [
-  {projectName: 'sample-lexer-program', copyPublic: true},
-  {projectName: 'sample-vm-program', copyPublic: false}
-].map(({projectName, copyPublic}) => ({
+  {
+    projectName: 'sample-lexer-program', copyDirs: [
+      { src: `src/app/sample-lexer-program/public/*`, dest: `dist/sample-lexer-program/` },
+      { src: `node_modules/codemirror/lib/*`, dest: `dist/sample-lexer-program/` }
+    ]
+  },
+  { projectName: 'sample-vm-program' }
+].map(({ projectName, copyDirs }) => ({
   input: `dist/tsc/app/${projectName}/index.js`,
   output: [
     {
       file: `dist/${projectName}/index.pretty.js`,
       name: 'create_single_file',
-      format: 'es',
+      format: 'es'
     },
     {
       file: `dist/${projectName}/index.js`,
@@ -36,14 +41,12 @@ const projects = [
     }
   ],
   plugins: [
-    ...globalPlugins,  
-    ...(copyPublic ? [
+    ...globalPlugins,
+    ...(copyDirs ? [
       copy({
-        targets: [
-          { src: `src/app/${projectName}/public/*`, dest: `dist/${projectName}/` }
-        ]
+        targets: copyDirs
       })
-    ]:[])
+    ] : [])
   ]
 }));
 
