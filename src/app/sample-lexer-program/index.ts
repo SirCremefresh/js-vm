@@ -8,13 +8,31 @@ function onDomReady(fn: () => void) {
   }
 }
 
+function textWidth(text: string, fontProp: string): number {
+  const tag = document.createElement('div');
+  tag.style.position = 'absolute';
+  tag.style.left = '-999em';
+  tag.style.whiteSpace = 'nowrap';
+  tag.style.font = fontProp;
+  tag.innerHTML = text;
+
+  document.body.appendChild(tag);
+
+  const result = tag.clientWidth;
+
+  document.body.removeChild(tag);
+
+  return result;
+}
+
+let characterWith: number;
+let asdf = 0;
+
 onDomReady(() => {
   const editor = document.getElementById('editor');
+  characterWith = textWidth('C', 'JetBrains Mono 1em') - 1;
 
   if (editor != null) {
-    // editor.onclick = e => console.log(e);
-
-    let clean: any, cursor: any;
     editor.addEventListener('click', e => {
       const position = window.getSelection()?.focusOffset;
       if (position === undefined) {
@@ -24,6 +42,15 @@ onDomReady(() => {
       console.log(e.target);
       console.log(position);
       console.log(e);
+
+      console.log(editor.childNodes);
+      const cursor = editor.querySelectorAll('.line-number')[0].querySelector('.cursor');
+      console.log(characterWith);
+      console.log(asdf);
+      asdf += 1;
+      (cursor as HTMLElement).style.left = `${asdf * 6}px`;
+      console.dir((cursor as HTMLElement).style.left);
+
       // if (cursor && position > cursor)
       //   position--;
       // if (clean)
@@ -39,9 +66,7 @@ onDomReady(() => {
   console.log('after');
 
 
-
 });
-
 
 
 const programText = `//hello world program

@@ -1,6 +1,6 @@
 import {terser} from 'rollup-plugin-terser';
 import replace from '@rollup/plugin-replace';
-import copy from 'rollup-plugin-copy'
+import copy from 'rollup-plugin-copy';
 
 const globalPlugins =  [
   replace({
@@ -13,7 +13,7 @@ const terserPlugin = terser({
   compress: true,
   module: true,
   mangle: true
-})
+});
 
 const projects = [
   {projectName: 'sample-lexer-program', copyPublic: true},
@@ -45,6 +45,6 @@ const projects = [
       })
     ]:[])
   ]
-}))
+}));
 
 export default [...projects];
