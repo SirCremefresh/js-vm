@@ -24,13 +24,13 @@ let cursor: HTMLElement;
 let offsetTop: number;
 let offsetLeft: number;
 
-let programText = `//hello world program
+let programText = `//hel   lo world program
 push 100000 // asdf
 load %rd // asdfg
 load %ra // asdfg
 load %rc // asdfg
 log %rd
-
+push 200
 
 my-label:
 inc %rc, 1
@@ -63,21 +63,21 @@ onDomReady(() => {
     }
 
     if (event.key.length === 1) {
-      const character = (event.key !== ' ') ? event.key : '\xa0';
+      const character = (event.key !== ' ') ? event.key : ' ';
       const lines = programText.split('\n');
       const line = lines[cursorY];
       lines[cursorY] = line.slice(0, cursorX) + character + line.slice(cursorX);
       programText = lines.join('\n');
       cursorX++;
       renderCode();
-    } else if(event.key === 'Backspace') {
+    } else if (event.key === 'Backspace') {
       const lines = programText.split('\n');
       const line = lines[cursorY];
       lines[cursorY] = line.slice(0, cursorX - 1) + line.slice(cursorX);
       programText = lines.join('\n');
       cursorX--;
       renderCode();
-    }else if (event.key === 'ArrowRight') {
+    } else if (event.key === 'ArrowRight') {
       cursorX++;
     } else if (event.key === 'ArrowLeft') {
       cursorX--;
@@ -122,7 +122,7 @@ function renderCode() {
     const tokenClass = tokenToClassNameMap[tokenElement.token];
 
     if (tokenClass) {
-      line.appendChild(createSpanWithContent(tokenClass, programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1)));
+      line.appendChild(createSpanWithContent(tokenClass, programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1).replace(/\s/g, '\xa0')));
     } else {
       switch (tokenElement.token) {
       case Token.TOKEN_NEWLINE:
