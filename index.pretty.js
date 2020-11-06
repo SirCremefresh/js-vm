@@ -116,28 +116,23 @@ onDomReady(() => {
         if (event.key !== 'F5') {
             event.preventDefault();
         }
+        console.log(event.target);
         if (event.key.length === 1) {
             const character = (event.key !== ' ') ? event.key : ' ';
-            const lines = programText.split('\n');
-            const line = lines[cursorY];
-            lines[cursorY] = line.slice(0, cursorX) + character + line.slice(cursorX);
-            programText = lines.join('\n');
+            const linePoints = getPointsOfLine(cursorY);
+            programText = programText.slice(0, cursorX + linePoints.startIndex) + character + programText.slice(cursorX + linePoints.startIndex);
             cursorX++;
             renderCode();
         }
         else if (event.key === 'Backspace') {
-            const lines = programText.split('\n');
-            const line = lines[cursorY];
-            lines[cursorY] = line.slice(0, cursorX - 1) + line.slice(cursorX);
-            programText = lines.join('\n');
+            const linePoints = getPointsOfLine(cursorY);
+            programText = programText.slice(0, cursorX + linePoints.startIndex - 1) + programText.slice(cursorX + linePoints.startIndex);
             cursorX--;
             renderCode();
         }
         else if (event.key === 'Delete') {
-            const lines = programText.split('\n');
-            const line = lines[cursorY];
-            lines[cursorY] = line.slice(0, cursorX) + line.slice(cursorX + 1);
-            programText = lines.join('\n');
+            const linePoints = getPointsOfLine(cursorY);
+            programText = programText.slice(0, cursorX + linePoints.startIndex) + programText.slice(cursorX + linePoints.startIndex + 1);
             renderCode();
         }
         else if (event.key === 'Enter') {
@@ -170,6 +165,13 @@ onDomReady(() => {
     }, 500);
     console.log('after');
 });
+function getPointsOfLine(lineNumber) {
+    const line = editor.children[lineNumber * 2 + 1];
+    return {
+        startIndex: parseInt(line.dataset.startIndex),
+        endIndex: parseInt(line.dataset.endIndex)
+    };
+}
 const tokenToClassNameMap = {
     ["TOKEN_INSTRUCTION" /* TOKEN_INSTRUCTION */]: 'instruction',
     ["TOKEN_CONST" /* TOKEN_CONST */]: 'const',
