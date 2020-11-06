@@ -83,13 +83,13 @@ onDomReady(() => {
       lines[cursorY] = line.slice(0, cursorX) + line.slice(cursorX + 1);
       programText = lines.join('\n');
       renderCode();
-    }else if (event.key === 'Enter') {
+    } else if (event.key === 'Enter') {
       const lines = programText.split('\n');
       const line = lines[cursorY];
-      lines[cursorY] = line.slice(0, cursorX) + "\n" + line.slice(cursorX);
+      lines[cursorY] = line.slice(0, cursorX) + '\n' + line.slice(cursorX);
       programText = lines.join('\n');
       cursorY++;
-      cursorX=0;
+      cursorX = 0;
       renderCode();
     } else if (event.key === 'ArrowRight') {
       cursorX++;
@@ -128,26 +128,28 @@ function renderCode() {
   let line;
   for (const tokenElement of tokenStream) {
     if (!line) {
-      editor.appendChild(createSpanWithContent('line-number', `${lineNumber}:`));
+      editor.appendChild(createSpanWithContent('line-number', `${lineNumber}:`, tokenElement.startIndex, tokenElement.startIndex));
       line = createDiv('line');
+      line.dataset.startIndex = tokenElement.startIndex.toString();
       lineNumber++;
     }
 
     const tokenClass = tokenToClassNameMap[tokenElement.token];
 
     if (tokenClass) {
-      line.appendChild(createSpanWithContent(tokenClass, programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1).replace(/\s/g, '\xa0')));
+      line.appendChild(createSpanWithContent(tokenClass, programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1).replace(/\s/g, '\xa0'), tokenElement.startIndex, tokenElement.endIndex));
     } else {
       switch (tokenElement.token) {
       case Token.TOKEN_NEWLINE:
+        line.dataset.endIndex = tokenElement.endIndex.toString();
         editor.appendChild(line);
         line = null;
         break;
       case Token.TOKEN_WHITESPACE:
-        line.appendChild(createSpanWithContent(tokenClass, new Array(tokenElement.endIndex - tokenElement.startIndex + 2).join('\xa0')));
+        line.appendChild(createSpanWithContent(tokenClass, new Array(tokenElement.endIndex - tokenElement.startIndex + 2).join('\xa0'), tokenElement.startIndex, tokenElement.endIndex));
         break;
       default:
-        line.appendChild(createSpanWithContent('not-found', programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1)));
+        line.appendChild(createSpanWithContent('not-found', programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1), tokenElement.startIndex, tokenElement.endIndex));
       }
     }
   }
@@ -157,10 +159,12 @@ function renderCode() {
   console.timeEnd('render');
 }
 
-function createSpanWithContent(className: string, content: string): HTMLSpanElement {
+function createSpanWithContent(className: string, content: string, startIndex: number, endIndex: number): HTMLSpanElement {
   const span = document.createElement('span');
   span.classList.add(className);
   span.textContent = content;
+  span.dataset.startIndex = startIndex.toString();
+  span.dataset.endIndex = endIndex.toString();
   return span;
 }
 
