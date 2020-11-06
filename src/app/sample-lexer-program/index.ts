@@ -1,4 +1,4 @@
-import { getTokenStream } from '../../lib/lexer/index';
+import { getTokenStream, Token } from '../../lib/lexer/index';
 
 function onDomReady(fn: () => void) {
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -22,6 +22,20 @@ let cursor: HTMLElement;
 
 let offsetTop: number;
 let offsetLeft: number;
+
+const programText = `//hello world program
+push 100000 // asdf
+load %rd // asdfg
+log %rd
+
+
+my-label:
+inc %rc, 1
+jl my-label
+
+halt`;
+
+const tokenStream = getTokenStream(programText);
 
 onDomReady(() => {
   editor = document.getElementById('editor') as HTMLElement;
@@ -60,9 +74,65 @@ onDomReady(() => {
     console.log(event.key);
     updateCursor();
   });
-  setTimeout(updateCursor, 500);
+  setTimeout(() => {
+    renderCode();
+    updateCursor();
+  }, 500);
   console.log('after');
 });
+
+const tokenToClassNameMap: { [key: string]: string } = {
+  [Token.TOKEN_INSTRUCTION]: 'instruction',
+  [Token.TOKEN_CONST]: 'const',
+  [Token.TOKEN_REGISTER]: 'register',
+  [Token.TOKEN_COMMENT]: 'comment'
+};
+
+function renderCode() {
+  while (editor.firstChild) {
+    editor.removeChild(editor.firstChild);
+  }
+  let lineNumber = 1;
+  let line;
+  for (const tokenElement of tokenStream) {
+    if (!line) {
+      editor.appendChild(createSpanWithContent('line-number', `${lineNumber}:`));
+      line = createDiv('line');
+      editor.appendChild(line);
+      lineNumber++;
+    }
+
+    const tokenClass = tokenToClassNameMap[tokenElement.token];
+
+    if (tokenClass) {
+      line.appendChild(createSpanWithContent(tokenClass, programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1)));
+    } else {
+      switch (tokenElement.token) {
+      case Token.TOKEN_NEWLINE:
+        line = null;
+        break;
+      case Token.TOKEN_WHITESPACE:
+        line.appendChild(createSpanWithContent(tokenClass, new Array(tokenElement.endIndex - tokenElement.startIndex + 2).join('\xa0')));
+        break;
+      default:
+        line.appendChild(createSpanWithContent('not-found', programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1)));
+      }
+    }
+  }
+}
+
+function createSpanWithContent(className: string, content: string): HTMLSpanElement {
+  const span = document.createElement('span');
+  span.classList.add(className);
+  span.textContent = content;
+  return span;
+}
+
+function createDiv(className: string): HTMLDivElement {
+  const div = document.createElement('div');
+  div.classList.add(className);
+  return div;
+}
 
 function updateCursor() {
   const lineNumberWith = (editor.querySelector('.line-number') as Element).scrollWidth;
@@ -70,60 +140,3 @@ function updateCursor() {
   cursor.style.left = `${offsetLeft + lineNumberWith - fontLength / 2 + cursorX * fontLength}px`;
 }
 
-
-const programText = `//hello world program
-push 100000 // asdf
-load %rd // asdfg
-log %rd
-
-
-my-label:
-inc %rc, 1
-jl my-label
-
-halt`;
-
-const tokenStream = getTokenStream(programText);
-
-console.log(tokenStream.map(tokenElement => ({
-  ...tokenElement,
-  code: programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1)
-})));
-console.log(programText.length);
-console.log(tokenStream[tokenStream.length - 1].endIndex - programText.length == -1 ? 'passed' : 'failed');
-
-
-// Lang 6
-// Hoch 12.5
-
-// Lang 24
-// Hoch 25
-// editor.addEventListener('click', e => {
-//   const position = window.getSelection()?.focusOffset;
-//   if (position === undefined) {
-//     console.log('could not get position');
-//     return null;
-//   }
-//   console.log(e.target);
-//   console.log(position);
-//   console.log(e);
-//
-//   console.log(editor.childNodes);
-//   const cursor = document.querySelector('.cursor') as HTMLElement;
-//   console.log(characterWith);
-//   console.log(asdf);
-//   asdf += 1;
-//   (cursor as HTMLElement).style.top = `${offsetTop}px`;
-//   (cursor as HTMLElement).style.left = `${offsetLeft + asdf * 6}px`;
-//   console.dir((cursor as HTMLElement).style.left);
-//
-//   // if (cursor && position > cursor)
-//   //   position--;
-//   // if (clean)
-//   //   editor['innerText'] = clean;
-//   // const textnode = (editor.firstChild['splitText'] as any)(position);
-//   // clean = textnode.wholeText;
-//   // cursor = position;
-//   // editor.insertBefore(document.createTextNode('|'), textnode);
-//   // editor['innerText'] = textnode.wholeText;
-// });

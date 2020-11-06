@@ -1,2 +1,2 @@
 
-export {getTokenStream} from './lexer';
+export {getTokenStream, Token} from './lexer';

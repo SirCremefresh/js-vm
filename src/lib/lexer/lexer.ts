@@ -1,7 +1,7 @@
 export type TokenElement = { token: Token, startIndex: number, endIndex: number };
 type TokenStreamCtx = { startIndex: number, state: Token, tokenStream: TokenElement[] };
 
-const enum Token {
+export const enum Token {
   //MEMORY
   TOKEN_REGISTER = 'TOKEN_REGISTER',
   TOKEN_STACK = 'TOKEN_STACK',
