@@ -74,7 +74,7 @@ onDomReady(() => {
         programText = programText.slice(0, cursorX + linePoints.startIndex - 1) + programText.slice(cursorX + linePoints.startIndex);
         cursorX--;
       } else if (cursorY > 0) {
-        const linePointsPrev = getPointsOfLine(cursorY -1 );
+        const linePointsPrev = getPointsOfLine(cursorY - 1);
         programText = programText.slice(0, cursorX + linePoints.startIndex - 1) + programText.slice(cursorX + linePoints.startIndex);
         cursorX = linePointsPrev.endIndex - linePointsPrev.startIndex;
         cursorY--;
@@ -117,7 +117,16 @@ onDomReady(() => {
         }
       }
     } else if (event.key === 'ArrowDown') {
-      cursorY++;
+      const lineCount = getRenderedLineCount();
+      if (cursorY < lineCount - 1) {
+        const linePointsNext = getPointsOfLine(++cursorY);
+        if (cursorX > linePointsNext.endIndex - linePointsNext.startIndex) {
+          cursorX = linePointsNext.endIndex - linePointsNext.startIndex;
+        }
+      } else {
+        const linePoints = getPointsOfLine(cursorY);
+        cursorX = linePoints.endIndex - linePoints.startIndex + 1;
+      }
     } else if (event.key === 'ArrowUp') {
       cursorY--;
     }
