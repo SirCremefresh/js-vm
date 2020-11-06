@@ -77,6 +77,20 @@ onDomReady(() => {
       programText = lines.join('\n');
       cursorX--;
       renderCode();
+    } else if (event.key === 'Delete') {
+      const lines = programText.split('\n');
+      const line = lines[cursorY];
+      lines[cursorY] = line.slice(0, cursorX) + line.slice(cursorX + 1);
+      programText = lines.join('\n');
+      renderCode();
+    }else if (event.key === 'Enter') {
+      const lines = programText.split('\n');
+      const line = lines[cursorY];
+      lines[cursorY] = line.slice(0, cursorX) + "\n" + line.slice(cursorX);
+      programText = lines.join('\n');
+      cursorY++;
+      cursorX=0;
+      renderCode();
     } else if (event.key === 'ArrowRight') {
       cursorX++;
     } else if (event.key === 'ArrowLeft') {
