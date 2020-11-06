@@ -116,7 +116,6 @@ onDomReady(() => {
         if (event.key !== 'F5') {
             event.preventDefault();
         }
-        console.log(event.target);
         if (event.key.length === 1) {
             const character = (event.key !== ' ') ? event.key : ' ';
             const linePoints = getPointsOfLine(cursorY);
@@ -148,7 +147,16 @@ onDomReady(() => {
             cursorX++;
         }
         else if (event.key === 'ArrowLeft') {
-            cursorX--;
+            if (cursorX > 0) {
+                cursorX--;
+            }
+            else {
+                if (cursorY > 0) {
+                    const linePoints = getPointsOfLine(cursorY - 1);
+                    cursorX = linePoints.endIndex - linePoints.startIndex;
+                    cursorY--;
+                }
+            }
         }
         else if (event.key === 'ArrowDown') {
             cursorY++;
