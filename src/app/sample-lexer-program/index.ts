@@ -128,7 +128,14 @@ onDomReady(() => {
         cursorX = linePoints.endIndex - linePoints.startIndex + 1;
       }
     } else if (event.key === 'ArrowUp') {
-      cursorY--;
+      if (cursorY > 0) {
+        const linePointsPrev = getPointsOfLine(--cursorY);
+        if (cursorX > linePointsPrev.endIndex - linePointsPrev.startIndex) {
+          cursorX = linePointsPrev.endIndex - linePointsPrev.startIndex;
+        }
+      } else {
+        cursorX = 0;
+      }
     }
     console.log(event.key);
     updateCursor();
