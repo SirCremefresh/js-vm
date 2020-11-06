@@ -86,7 +86,19 @@ onDomReady(() => {
       cursorX = 0;
       renderCode();
     } else if (event.key === 'ArrowRight') {
-      cursorX++;
+      const linePoints = getPointsOfLine(cursorY);
+
+      if (cursorX < linePoints.endIndex - linePoints.startIndex) {
+        cursorX++;
+      } else {
+        const lineCount = getRenderedLineCount();
+        if (cursorY < lineCount - 1) {
+          cursorX = 0;
+          cursorY++;
+        } else {
+          cursorX = linePoints.endIndex - linePoints.startIndex + 1;
+        }
+      }
     } else if (event.key === 'ArrowLeft') {
       if (cursorX > 0) {
         cursorX--;
@@ -121,7 +133,7 @@ function getPointsOfLine(lineNumber: number): { startIndex: number, endIndex: nu
 }
 
 function getRenderedLineCount(): number {
-  return editor.children.length;
+  return editor.children.length / 2;
 }
 
 const tokenToClassNameMap: { [key: string]: string } = {
@@ -168,6 +180,7 @@ function renderCode() {
     }
   }
   if (line) {
+    line.dataset.endIndex = tokenStream[tokenStream.length - 1].endIndex.toString();
     editor.appendChild(line);
   }
   console.timeEnd('render');
