@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Sample Lexer Program</title>
+  <script src="./index.js"></script>
+  <link rel="stylesheet" href="./jetbrains-mono.css">
+  <style>
+      :root {
+          --editor-font-size: 10px;
+      }
+
+      .mono-font {
+          -webkit-font-feature-settings: "liga" on, "calt" on;
+          -webkit-font-smoothing: antialiased;
+          text-rendering: optimizeLegibility;
+          font-family: 'JetBrains Mono', 'sans-serif';
+          font-size: var(--editor-font-size);
+      }
+
+      .editor {
+          background: darkslategrey;
+          display: grid;
+          grid-template-columns: auto 1fr;
+      }
+
+      .editor .line-number {
+          padding-right: 1rem;
+          color: azure;
+          user-select: none;
+      }
+
+      .editor .instruction {
+          color: chocolate;
+      }
+
+      .editor .register {
+          color: lightblue;
+      }
+
+      .editor .const {
+          color: wheat;
+      }
+
+      .editor .comment {
+          color: darkgrey;
+      }
+
+      .cursor {
+          color: mintcream;
+          position: absolute;
+          display: block;
+          width: 0;
+          text-align: left;
+          left: 0;
+          animation: 1s blink step-end infinite;
+          user-select: none;
+      }
+
+      @keyframes blink {
+          from, to {
+              color: transparent;
+          }
+          50% {
+              color: mintcream;
+          }
+      }
+
+  </style>
+</head>
+<span class="cursor mono-font">|</span>
+<body>
+<div class="editor mono-font" id="editor">
+</div>
+</body>
+</html>
