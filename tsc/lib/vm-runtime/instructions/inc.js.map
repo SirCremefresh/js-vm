@@ -1,1 +1,0 @@
-{"version":3,"file":"inc.js","sourceRoot":"","sources":["../../../../../src/lib/vm-runtime/instructions/inc.ts"],"names":[],"mappings":"AAEA,MAAM,UAAU,GAAG,CAAC,OAAgB;IAClC,OAAO,CAAC,SAAS,CAAC,OAAO,CAAC,eAAe,EAAE,CAAC,IAAI,OAAO,CAAC,eAAe,EAAE,CAAC;AAC5E,CAAC"}
