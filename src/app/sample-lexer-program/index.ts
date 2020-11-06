@@ -1,4 +1,5 @@
 import { getTokenStream, Token } from '../../lib/lexer/index';
+import { TokenElement } from '../../lib/lexer/lexer';
 
 function onDomReady(fn: () => void) {
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -23,9 +24,11 @@ let cursor: HTMLElement;
 let offsetTop: number;
 let offsetLeft: number;
 
-const programText = `//hello world program
+let programText = `//hello world program
 push 100000 // asdf
 load %rd // asdfg
+load %ra // asdfg
+load %rc // asdfg
 log %rd
 
 
@@ -35,7 +38,7 @@ jl my-label
 
 halt`;
 
-const tokenStream = getTokenStream(programText);
+let tokenStream: TokenElement[];
 
 onDomReady(() => {
   editor = document.getElementById('editor') as HTMLElement;
@@ -59,16 +62,19 @@ onDomReady(() => {
       event.preventDefault();
     }
 
-    if (event.key === 'ArrowRight') {
+    if (event.key.length === 1) {
+      const lines = programText.split("\n");
+      const line = lines[cursorY];
+      lines[cursorY] = line.slice(0, cursorX) + event.key + line.slice(cursorX);
+      programText = lines.join("\n");
+      renderCode();
+    } else if (event.key === 'ArrowRight') {
       cursorX++;
-    }
-    if (event.key === 'ArrowLeft') {
+    } else if (event.key === 'ArrowLeft') {
       cursorX--;
-    }
-    if (event.key === 'ArrowDown') {
+    } else if (event.key === 'ArrowDown') {
       cursorY++;
-    }
-    if (event.key === 'ArrowUp') {
+    } else if (event.key === 'ArrowUp') {
       cursorY--;
     }
     console.log(event.key);
@@ -89,6 +95,8 @@ const tokenToClassNameMap: { [key: string]: string } = {
 };
 
 function renderCode() {
+  tokenStream = getTokenStream(programText);
+
   while (editor.firstChild) {
     editor.removeChild(editor.firstChild);
   }
