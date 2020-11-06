@@ -125,8 +125,16 @@ onDomReady(() => {
         }
         else if (event.key === 'Backspace') {
             const linePoints = getPointsOfLine(cursorY);
-            programText = programText.slice(0, cursorX + linePoints.startIndex - 1) + programText.slice(cursorX + linePoints.startIndex);
-            cursorX--;
+            if (cursorX > 0) {
+                programText = programText.slice(0, cursorX + linePoints.startIndex - 1) + programText.slice(cursorX + linePoints.startIndex);
+                cursorX--;
+            }
+            else if (cursorY > 0) {
+                const linePointsPrev = getPointsOfLine(cursorY - 1);
+                programText = programText.slice(0, cursorX + linePoints.startIndex - 1) + programText.slice(cursorX + linePoints.startIndex);
+                cursorX = linePointsPrev.endIndex - linePointsPrev.startIndex;
+                cursorY--;
+            }
             renderCode();
         }
         else if (event.key === 'Delete') {
