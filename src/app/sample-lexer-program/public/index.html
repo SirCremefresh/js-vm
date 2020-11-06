@@ -26,6 +26,7 @@
       .editor .line-number {
           padding-right: 1rem;
           color: azure;
+          user-select: none;
       }
 
       .editor .instruction {
@@ -47,9 +48,10 @@
       .cursor {
           color: mintcream;
           position: absolute;
+          display: block;
           width: 0;
           text-align: left;
-          left: 0px;
+          left: 0;
           animation: 1s blink step-end infinite;
           user-select: none;
       }
