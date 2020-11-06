@@ -63,12 +63,21 @@ onDomReady(() => {
     }
 
     if (event.key.length === 1) {
+      const character = (event.key !== ' ') ? event.key : '\xa0';
       const lines = programText.split('\n');
       const line = lines[cursorY];
-      lines[cursorY] = line.slice(0, cursorX) + event.key + line.slice(cursorX);
+      lines[cursorY] = line.slice(0, cursorX) + character + line.slice(cursorX);
       programText = lines.join('\n');
+      cursorX++;
       renderCode();
-    } else if (event.key === 'ArrowRight') {
+    } else if(event.key === 'Backspace') {
+      const lines = programText.split('\n');
+      const line = lines[cursorY];
+      lines[cursorY] = line.slice(0, cursorX - 1) + line.slice(cursorX);
+      programText = lines.join('\n');
+      cursorX--;
+      renderCode();
+    }else if (event.key === 'ArrowRight') {
       cursorX++;
     } else if (event.key === 'ArrowLeft') {
       cursorX--;
@@ -95,7 +104,7 @@ const tokenToClassNameMap: { [key: string]: string } = {
 };
 
 function renderCode() {
-  console.time("render");
+  console.time('render');
   tokenStream = getTokenStream(programText);
 
   while (editor.firstChild) {
@@ -128,10 +137,10 @@ function renderCode() {
       }
     }
   }
-  if (line){
+  if (line) {
     editor.appendChild(line);
   }
-  console.timeEnd("render");
+  console.timeEnd('render');
 }
 
 function createSpanWithContent(className: string, content: string): HTMLSpanElement {
