@@ -17,9 +17,15 @@ let fontHeight = 0;
 let cursorX = 0;
 let cursorY = 0;
 
+let editor: HTMLElement;
+let cursor: HTMLElement;
+
+let offsetTop: number;
+let offsetLeft: number;
+
 onDomReady(() => {
-  const editor = document.getElementById('editor');
-  const cursor = document.querySelector('.cursor') as HTMLElement;
+  editor = document.getElementById('editor') as HTMLElement;
+  cursor = document.querySelector('.cursor') as HTMLElement;
 
   const fontSize = parseInt(
     getComputedStyle(document.documentElement)
@@ -29,42 +35,40 @@ onDomReady(() => {
   fontLength = fontSize * fontLengthScaling;
   fontHeight = fontSize * fontHeightScaling;
 
-  console.log({fontSize, fontLength, fontHeight});
+  console.log({ fontSize, fontLength, fontHeight });
 
-  if (editor != null) {
-    const offsetTop = editor.offsetTop;
-    const offsetLeft = 9;
+  offsetTop = editor.offsetTop;
+  offsetLeft = editor.offsetLeft;
 
-    document.addEventListener('keydown', event => {
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'F5') {
       event.preventDefault();
+    }
 
-      // if (event.isComposing || event.key === 229) {
-      //   return;
-      // }
-      if (event.key === 'ArrowRight') {
-        cursorX++;
-      }
-      if (event.key === 'ArrowLeft') {
-        cursorX--;
-      }
-      if (event.key === 'ArrowDown') {
-        cursorY++;
-      }
-      if (event.key === 'ArrowUp') {
-        cursorY--;
-      }
-      console.log(event.key);
-      cursor.style.top = `${offsetTop + cursorY * fontHeight}px`;
-      cursor.style.left = `${offsetLeft + cursorX * fontLength}px`;
-    });
-
-
-    console.log('added listener');
-  }
+    if (event.key === 'ArrowRight') {
+      cursorX++;
+    }
+    if (event.key === 'ArrowLeft') {
+      cursorX--;
+    }
+    if (event.key === 'ArrowDown') {
+      cursorY++;
+    }
+    if (event.key === 'ArrowUp') {
+      cursorY--;
+    }
+    console.log(event.key);
+    updateCursor();
+  });
+  setTimeout(updateCursor, 500);
   console.log('after');
-
-
 });
+
+function updateCursor() {
+  const lineNumberWith = (editor.querySelector('.line-number') as Element).scrollWidth;
+  cursor.style.top = `${offsetTop + cursorY * fontHeight}px`;
+  cursor.style.left = `${offsetLeft + lineNumberWith - fontLength / 2 + cursorX * fontLength}px`;
+}
 
 
 const programText = `//hello world program
