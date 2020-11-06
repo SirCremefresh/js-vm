@@ -62,8 +62,6 @@ onDomReady(() => {
       event.preventDefault();
     }
 
-    console.log(event.target);
-
     if (event.key.length === 1) {
       const character = (event.key !== ' ') ? event.key : ' ';
       const linePoints = getPointsOfLine(cursorY);
@@ -90,7 +88,15 @@ onDomReady(() => {
     } else if (event.key === 'ArrowRight') {
       cursorX++;
     } else if (event.key === 'ArrowLeft') {
-      cursorX--;
+      if (cursorX > 0) {
+        cursorX--;
+      } else {
+        if (cursorY > 0) {
+          const linePoints = getPointsOfLine(cursorY - 1);
+          cursorX = linePoints.endIndex - linePoints.startIndex;
+          cursorY--;
+        }
+      }
     } else if (event.key === 'ArrowDown') {
       cursorY++;
     } else if (event.key === 'ArrowUp') {
@@ -112,6 +118,10 @@ function getPointsOfLine(lineNumber: number): { startIndex: number, endIndex: nu
     startIndex: parseInt(line.dataset.startIndex as string),
     endIndex: parseInt(line.dataset.endIndex as string)
   };
+}
+
+function getRenderedLineCount(): number {
+  return editor.children.length;
 }
 
 const tokenToClassNameMap: { [key: string]: string } = {
