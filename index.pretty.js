@@ -88,6 +88,11 @@ let editor;
 let cursor;
 let offsetTop;
 let offsetLeft;
+// large text for testing
+// let programText = new Array(50)
+//   .fill('a')
+//   .map(v => Array(20).fill(v).join(' '))
+//   .join('\n');
 let programText = `//hel   lo world program
 push 100000 // asdf
 load %rd // asdfg
@@ -236,9 +241,10 @@ function renderCode() {
     }
     let lineNumber = 1;
     let line;
+    const lines = [];
     for (const tokenElement of tokenStream) {
         if (!line) {
-            editor.appendChild(createSpanWithContent('line-number', `${lineNumber}:`, tokenElement.startIndex, tokenElement.startIndex));
+            lines.push(createSpanWithContent('line-number', `${lineNumber}:`, tokenElement.startIndex, tokenElement.startIndex));
             line = createDiv('line');
             line.dataset.startIndex = tokenElement.startIndex.toString();
             lineNumber++;
@@ -251,7 +257,7 @@ function renderCode() {
             switch (tokenElement.token) {
                 case "TOKEN_NEWLINE" /* TOKEN_NEWLINE */:
                     line.dataset.endIndex = tokenElement.endIndex.toString();
-                    editor.appendChild(line);
+                    lines.push(line);
                     line = null;
                     break;
                 case "TOKEN_WHITESPACE" /* TOKEN_WHITESPACE */:
@@ -264,7 +270,10 @@ function renderCode() {
     }
     if (line) {
         line.dataset.endIndex = tokenStream[tokenStream.length - 1].endIndex.toString();
-        editor.appendChild(line);
+        lines.push(line);
+    }
+    if (lines.length > 0) {
+        editor.append(...lines);
     }
     console.timeEnd('render');
 }
