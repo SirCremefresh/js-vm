@@ -117,6 +117,13 @@ onDomReady(() => {
     console.log({ fontSize, fontLength, fontHeight });
     offsetTop = editor.offsetTop;
     offsetLeft = editor.offsetLeft;
+    document.addEventListener('click', event => {
+        const { clientX, clientY } = event;
+        const lineNumberWith = getLineNumberWith();
+        cursorX = Math.floor((clientX - offsetLeft - lineNumberWith) / fontLength);
+        cursorY = Math.floor((clientY - offsetTop) / fontHeight);
+        updateCursor();
+    });
     document.addEventListener('keydown', event => {
         if (event.key !== 'F5') {
             event.preventDefault();
@@ -290,8 +297,11 @@ function createDiv(className) {
     div.classList.add(className);
     return div;
 }
+function getLineNumberWith() {
+    return editor.querySelector('.line-number').scrollWidth;
+}
 function updateCursor() {
-    const lineNumberWith = editor.querySelector('.line-number').scrollWidth;
+    const lineNumberWith = getLineNumberWith();
     cursor.style.top = `${offsetTop + cursorY * fontHeight}px`;
     cursor.style.left = `${offsetLeft + lineNumberWith - fontLength / 2 + cursorX * fontLength}px`;
 }
