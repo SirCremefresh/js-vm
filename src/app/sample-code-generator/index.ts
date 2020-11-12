@@ -14,7 +14,7 @@ function getCodeFromToken(tokenElement: TokenElement): string {
   return programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1);
 }
 
-function fail(message: string): never {
+function panic(message: string): never {
   console.error(message);
   process.exit(1);
 }
@@ -47,7 +47,7 @@ const TokenHandlers = {
     if (isInstruction(instructionCode)) {
       return [InstructionHandlers[instructionCode](tokenElement)];
     } else {
-      fail(`Instruction not recognised: ${instructionCode}. location: ${tokenElement.startIndex}`);
+      panic(`Instruction not recognised: ${instructionCode}. location: ${tokenElement.startIndex}`);
     }
   },
   [Token.TOKEN_COMMENT]: (tokenElement: TokenElement) => {
@@ -57,7 +57,7 @@ const TokenHandlers = {
     return [];
   },
   [Token.TOKEN_INVALID]: (tokenElement: TokenElement) => {
-    fail(`Invalid. location: ${tokenElement.startIndex}`);
+    panic(`Invalid. location: ${tokenElement.startIndex}`);
   },
   [Token.TOKEN_LABEL]: (tokenElement: TokenElement) => {
     return [];
@@ -71,7 +71,7 @@ const TokenHandlers = {
     case '%rd':
       return [Register.D];
     default:
-      fail(`Register is not known: ${code}. location: ${tokenElement.startIndex}`);
+      panic(`Register is not known: ${code}. location: ${tokenElement.startIndex}`);
     }
     return [];
   },
@@ -85,6 +85,8 @@ const TokenHandlers = {
     return [];
   }
 };
+
+const parametres = [];
 
 const result = [];
 for (const tokenElement of tokenStream) {
