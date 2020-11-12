@@ -44,8 +44,7 @@ const InstructionHandlers = {
   },
   jl: (generatorState: GeneratorState) => {
     const [, par1] = generatorState.line;
-    return [Instruction.INSTRUCTION_INC];
-    // return [Instruction.INSTRUCTION_INC, getCodeFromToken(par1).slice(0, -1)];
+    return [Instruction.INSTRUCTION_JL, getCodeFromToken(par1)];
   },
   halt: (generatorState: GeneratorState) => {
     return [Instruction.INSTRUCTION_HALT];
@@ -59,42 +58,26 @@ function isInstruction(code: string | InstructionHandler): code is InstructionHa
 }
 
 interface GeneratorState {
-  result: Array<number>,
+  result: Array<number | string>,
   line: TokenElement[],
   labelMap: Map<string, number>
 }
 
-const generatorState: GeneratorState = {
-  result: [],
-  line: [],
-  labelMap: new Map<string, number>()
-};
 
-
-const programText = `
-push 100000
-load %rd
-log %rd
-halt
-`;
-
-
-const tokenStream = getTokenStream(programText);
-
-const ignorableTokens = [Token.TOKEN_WHITESPACE, Token.TOKEN_COMMENT, Token.TOKEN_COMMA];
-
-for (const tokenElement of tokenStream) {
-  if (ignorableTokens.includes(tokenElement.token)) {
-    continue;
+function inlineLabelRefrences(generatorState: GeneratorState): GeneratorState {
+  for (let i = 0; i < generatorState.result.length; i++) {
+    if (typeof generatorState.result[i] === 'string') {
+      const labelIndex = generatorState.labelMap.get(generatorState.result[i] as string);
+      if (!labelIndex) {
+        panic(`Label not found. labelk: ${generatorState.result[i]}`);
+      }
+      generatorState.result[i] = labelIndex;
+    }
   }
-  if (tokenElement.token !== Token.TOKEN_NEWLINE) {
-    generatorState.line.push(tokenElement);
-    continue;
-  }
-  if (generatorState.line.length === 0) {
-    continue;
-  }
+  return generatorState;
+}
 
+function processLine(generatorState: GeneratorState, tokenElement: TokenElement): GeneratorState {
   const [firstToken] = generatorState.line;
   if (firstToken.token === Token.TOKEN_INSTRUCTION) {
     const instructionCode = getCodeFromToken(firstToken);
@@ -105,17 +88,60 @@ for (const tokenElement of tokenStream) {
     }
     generatorState.line = [];
   } else if (firstToken.token === Token.TOKEN_LABEL) {
-    const code = getCodeFromToken(tokenElement).slice(0, -1);
-    generatorState.result.push(Instruction.INSTRUCTION_LABEL);
+    const code = getCodeFromToken(firstToken).slice(0, -1);
     generatorState.labelMap.set(code, generatorState.result.length);
+    generatorState.result.push(Instruction.INSTRUCTION_LABEL);
+    generatorState.line = [];
   } else if (firstToken.token !== Token.TOKEN_COMMENT) {
     panic(`Line needs to start with Instruction or Comment code: ${firstToken}. location: ${firstToken.startIndex}`);
   }
+  return generatorState;
 }
 
-console.log(generatorState);
+function generateCode(programText: string) {
+  let generatorState: GeneratorState = {
+    result: [],
+    line: [],
+    labelMap: new Map<string, number>()
+  };
 
-const instructions = Int32Array.from(generatorState.result);
+  const tokenStream = getTokenStream(programText);
+  const ignorableTokens = [Token.TOKEN_WHITESPACE, Token.TOKEN_COMMENT, Token.TOKEN_COMMA];
 
-const vm = new Vm(instructions);
-vm.run();
+  for (const tokenElement of tokenStream) {
+    if (ignorableTokens.includes(tokenElement.token)) {
+      continue;
+    }
+    if (tokenElement.token !== Token.TOKEN_NEWLINE) {
+      generatorState.line.push(tokenElement);
+      continue;
+    }
+    if (generatorState.line.length === 0) {
+      continue;
+    }
+    generatorState = processLine(generatorState, tokenElement);
+  }
+
+  generatorState = inlineLabelRefrences(generatorState);
+
+  return Int32Array.from(generatorState.result as Array<number>);
+}
+
+const programText = `
+push 100
+load %rd
+log %rd
+loop_start:
+inc %rc, 1
+log %rc
+jl loop_start
+halt
+`;
+
+const vm = new Vm(generateCode(programText));
+try {
+  vm.run();
+} catch (e) {
+  console.log('error');
+  console.log(vm.vmState);
+}
