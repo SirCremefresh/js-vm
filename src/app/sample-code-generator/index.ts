@@ -77,14 +77,14 @@ function inlineLabelRefrences(generatorState: GeneratorState): GeneratorState {
   return generatorState;
 }
 
-function processLine(generatorState: GeneratorState, tokenElement: TokenElement): GeneratorState {
+function processLine(generatorState: GeneratorState): GeneratorState {
   const [firstToken] = generatorState.line;
   if (firstToken.token === Token.TOKEN_INSTRUCTION) {
     const instructionCode = getCodeFromToken(firstToken);
     if (isInstruction(instructionCode)) {
       generatorState.result.push(...InstructionHandlers[instructionCode](generatorState));
     } else {
-      panic(`Instruction not recognised: ${instructionCode}. location: ${tokenElement.startIndex}`);
+      panic(`Instruction not recognised: ${instructionCode}. location: ${firstToken.startIndex}`);
     }
     generatorState.line = [];
   } else if (firstToken.token === Token.TOKEN_LABEL) {
@@ -119,7 +119,11 @@ function generateCode(programText: string) {
     if (generatorState.line.length === 0) {
       continue;
     }
-    generatorState = processLine(generatorState, tokenElement);
+    generatorState = processLine(generatorState);
+  }
+
+  if (generatorState.line.length > 0) {
+    generatorState = processLine(generatorState);
   }
 
   generatorState = inlineLabelRefrences(generatorState);
@@ -135,8 +139,7 @@ loop_start:
 inc %rc, 1
 log %rc
 jl loop_start
-halt
-`;
+halt`;
 
 const vm = new Vm(generateCode(programText));
 try {
