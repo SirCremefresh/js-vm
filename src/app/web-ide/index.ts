@@ -19,6 +19,7 @@ let cursorX = 0;
 let cursorY = 0;
 
 let editor: HTMLElement;
+let editorPanel: HTMLElement;
 let cursor: HTMLElement;
 
 let offsetTop = 0;
@@ -41,8 +42,24 @@ halt`;
 
 let tokenStream: TokenElement[];
 
+function eventHasParent(event: Event, parent: HTMLElement) {
+  if (event.target === null || !(event.target instanceof HTMLElement)) {
+    return false;
+  }
+  let checkingElement = event.target;
+  do {
+    if (checkingElement === parent) {
+      return true;
+    }
+    checkingElement = checkingElement.parentElement as HTMLElement;
+  } while (checkingElement !== null);
+
+  return false;
+}
+
 onDomReady(() => {
   editor = document.getElementById('editor') as HTMLElement;
+  editorPanel = document.querySelector('.editor-panel') as HTMLElement;
   cursor = document.querySelector('.cursor') as HTMLElement;
 
   const fontSize = parseInt(
@@ -56,7 +73,11 @@ onDomReady(() => {
   console.log({ fontSize, fontLength, fontHeight });
 
   document.addEventListener('click', event => {
-    const {clientX, clientY} = event;
+    if (!eventHasParent(event, editorPanel)) {
+      return;
+    }
+
+    const { clientX, clientY } = event;
     const lineNumberWith = getLineNumberWith();
     cursorX = Math.floor((clientX - offsetLeft - lineNumberWith) / fontLength);
     cursorY = Math.floor((clientY - offsetTop) / fontHeight);
