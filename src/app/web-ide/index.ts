@@ -21,8 +21,8 @@ let cursorY = 0;
 let editor: HTMLElement;
 let cursor: HTMLElement;
 
-let offsetTop: number;
-let offsetLeft: number;
+let offsetTop = 0;
+let offsetLeft = 0;
 
 // large text for testing
 // let programText = new Array(50)
@@ -30,18 +30,13 @@ let offsetLeft: number;
 //   .map(v => Array(20).fill(v).join(' '))
 //   .join('\n');
 
-let programText = `//hel   lo world program
-push 100000 // asdf
-load %rd // asdfg
-load %ra // asdfg
-load %rc // asdfg
+let programText = `push 100
+load %rd
 log %rd
-push 200
-
-my-label:
+loop_start:
 inc %rc, 1
-jl my-label
-
+log %rc
+jl loop_start
 halt`;
 
 let tokenStream: TokenElement[];
@@ -59,9 +54,6 @@ onDomReady(() => {
   fontHeight = fontSize * fontHeightScaling;
 
   console.log({ fontSize, fontLength, fontHeight });
-
-  offsetTop = editor.offsetTop;
-  offsetLeft = editor.offsetLeft;
 
   document.addEventListener('click', event => {
     const {clientX, clientY} = event;
@@ -155,6 +147,9 @@ onDomReady(() => {
     updateCursor();
   });
   setTimeout(() => {
+    offsetTop = editor.offsetTop;
+    offsetLeft = editor.offsetLeft;
+
     renderCode();
     updateCursor();
   }, 500);
@@ -249,6 +244,7 @@ function getLineNumberWith() {
 
 function updateCursor() {
   const lineNumberWith = getLineNumberWith();
+  console.log(lineNumberWith, offsetLeft);
   cursor.style.top = `${offsetTop + cursorY * fontHeight}px`;
   cursor.style.left = `${offsetLeft + lineNumberWith - fontLength / 2 + cursorX * fontLength}px`;
 }

@@ -10,6 +10,7 @@
     "serve:web-ide": "serve dist/web-ide",
     "build:watch": "rm -rf ./dist && mkdir ./dist && watch 'tsc --incremental && rollup -c' src",
     "build:watch:web-ide": "rm -rf ./dist && mkdir ./dist && watch 'tsc --incremental && SPECIFIC_PROJECT=web-ide rollup -c' src",
+    "build:web-ide": "rm -rf ./dist && mkdir ./dist && tsc --incremental && SPECIFIC_PROJECT=web-ide rollup -c",
     "build": "rm -rf ./dist && mkdir ./dist && tsc && rollup -c",
     "build:ts": "tsc"
   },
