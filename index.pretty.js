@@ -225,7 +225,7 @@ function load(vmState) {
 }
 
 function log(vmState) {
-    console.log(vmState.registers[vmState.nextInstruction()]);
+    vmState.stdOut(vmState.registers[vmState.nextInstruction()]);
 }
 
 function push(vmState) {
@@ -253,11 +253,15 @@ const InstructionMap = {
 };
 
 class VmState {
-    constructor(instructions) {
+    constructor(instructions, stdOut = null) {
+        this.stdOut = console.log;
         this.stack = [];
         this.registers = new Int32Array(4 /* REGISTER_LENGTH */);
         this.instructionIndex = 0;
         this.instructions = instructions;
+        if (stdOut !== null) {
+            this.stdOut = stdOut;
+        }
     }
     nextInstruction() {
         return this.instructions[this.instructionIndex++];
@@ -265,8 +269,8 @@ class VmState {
 }
 
 class Vm {
-    constructor(instructions) {
-        this.vmState = new VmState(instructions);
+    constructor(instructions, stdOut = null) {
+        this.vmState = new VmState(instructions, stdOut);
     }
     run() {
         let instruction;
@@ -325,7 +329,6 @@ function renderCodeToEditor(programText, editor) {
     if (lines.length > 0) {
         editor.append(...lines);
     }
-    console.timeEnd('render');
 }
 function createSpanWithContent(className, content, startIndex, endIndex) {
     const span = document.createElement('span');
@@ -407,7 +410,9 @@ onDomReady(() => {
     fontLength = fontSize * fontLengthScaling;
     fontHeight = fontSize * fontHeightScaling;
     runControl.addEventListener('click', event => {
-        const vm = new Vm(generateCode(programText));
+        const vm = new Vm(generateCode(programText), (message) => {
+            console.log(`this is cool message: ${message}`);
+        });
         try {
             vm.run();
         }
