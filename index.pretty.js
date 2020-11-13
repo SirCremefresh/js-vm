@@ -85,43 +85,66 @@ let fontHeight = 0;
 let cursorX = 0;
 let cursorY = 0;
 let editor;
+let editorPanel;
 let cursor;
-let offsetTop;
-let offsetLeft;
+let offsetTop = 0;
+let offsetLeft = 0;
 // large text for testing
 // let programText = new Array(50)
 //   .fill('a')
 //   .map(v => Array(20).fill(v).join(' '))
 //   .join('\n');
-let programText = `//hel   lo world program
-push 100000 // asdf
-load %rd // asdfg
-load %ra // asdfg
-load %rc // asdfg
+let programText = `push 100
+load %rd
 log %rd
-push 200
-
-my-label:
+loop_start:
 inc %rc, 1
-jl my-label
-
+log %rc
+jl loop_start
 halt`;
 let tokenStream;
+function eventHasParent(event, parent) {
+    if (event.target === null || !(event.target instanceof HTMLElement)) {
+        return false;
+    }
+    let checkingElement = event.target;
+    do {
+        if (checkingElement === parent) {
+            return true;
+        }
+        checkingElement = checkingElement.parentElement;
+    } while (checkingElement !== null);
+    return false;
+}
 onDomReady(() => {
     editor = document.getElementById('editor');
+    editorPanel = document.querySelector('.editor-panel');
     cursor = document.querySelector('.cursor');
     const fontSize = parseInt(getComputedStyle(document.documentElement)
         .getPropertyValue('--editor-font-size'));
     fontLength = fontSize * fontLengthScaling;
     fontHeight = fontSize * fontHeightScaling;
     console.log({ fontSize, fontLength, fontHeight });
-    offsetTop = editor.offsetTop;
-    offsetLeft = editor.offsetLeft;
     document.addEventListener('click', event => {
+        if (!eventHasParent(event, editorPanel)) {
+            return;
+        }
         const { clientX, clientY } = event;
         const lineNumberWith = getLineNumberWith();
         cursorX = Math.floor((clientX - offsetLeft - lineNumberWith) / fontLength);
         cursorY = Math.floor((clientY - offsetTop) / fontHeight);
+        cursorX = cursorX > 0 ? cursorX : 0;
+        cursorY = cursorY > 0 ? cursorY : 0;
+        const line = getPointsOfLine(cursorY);
+        if (!line) {
+            const lastLine = getPointsOfLastLine();
+            cursorY = editor.children.length / 2 - 1;
+            cursorX = lastLine.endIndex - lastLine.startIndex + 1;
+        }
+        else {
+            const maxX = line.endIndex - line.startIndex;
+            cursorX = cursorX < maxX ? cursorX : maxX;
+        }
         updateCursor();
     });
     document.addEventListener('keydown', event => {
@@ -130,19 +153,19 @@ onDomReady(() => {
         }
         if (event.key.length === 1) {
             const character = (event.key !== ' ') ? event.key : ' ';
-            const linePoints = getPointsOfLine(cursorY);
+            const linePoints = getPointsOfLineUnsafe(cursorY);
             programText = programText.slice(0, cursorX + linePoints.startIndex) + character + programText.slice(cursorX + linePoints.startIndex);
             cursorX++;
             renderCode();
         }
         else if (event.key === 'Backspace') {
-            const linePoints = getPointsOfLine(cursorY);
+            const linePoints = getPointsOfLineUnsafe(cursorY);
             if (cursorX > 0) {
                 programText = programText.slice(0, cursorX + linePoints.startIndex - 1) + programText.slice(cursorX + linePoints.startIndex);
                 cursorX--;
             }
             else if (cursorY > 0) {
-                const linePointsPrev = getPointsOfLine(cursorY - 1);
+                const linePointsPrev = getPointsOfLineUnsafe(cursorY - 1);
                 programText = programText.slice(0, cursorX + linePoints.startIndex - 1) + programText.slice(cursorX + linePoints.startIndex);
                 cursorX = linePointsPrev.endIndex - linePointsPrev.startIndex;
                 cursorY--;
@@ -150,7 +173,7 @@ onDomReady(() => {
             renderCode();
         }
         else if (event.key === 'Delete') {
-            const linePoints = getPointsOfLine(cursorY);
+            const linePoints = getPointsOfLineUnsafe(cursorY);
             programText = programText.slice(0, cursorX + linePoints.startIndex) + programText.slice(cursorX + linePoints.startIndex + 1);
             renderCode();
         }
@@ -164,7 +187,7 @@ onDomReady(() => {
             renderCode();
         }
         else if (event.key === 'ArrowRight') {
-            const linePoints = getPointsOfLine(cursorY);
+            const linePoints = getPointsOfLineUnsafe(cursorY);
             if (cursorX < linePoints.endIndex - linePoints.startIndex) {
                 cursorX++;
             }
@@ -185,7 +208,7 @@ onDomReady(() => {
             }
             else {
                 if (cursorY > 0) {
-                    const linePoints = getPointsOfLine(cursorY - 1);
+                    const linePoints = getPointsOfLineUnsafe(cursorY - 1);
                     cursorX = linePoints.endIndex - linePoints.startIndex;
                     cursorY--;
                 }
@@ -194,19 +217,19 @@ onDomReady(() => {
         else if (event.key === 'ArrowDown') {
             const lineCount = getRenderedLineCount();
             if (cursorY < lineCount - 1) {
-                const linePointsNext = getPointsOfLine(++cursorY);
+                const linePointsNext = getPointsOfLineUnsafe(++cursorY);
                 if (cursorX > linePointsNext.endIndex - linePointsNext.startIndex) {
                     cursorX = linePointsNext.endIndex - linePointsNext.startIndex;
                 }
             }
             else {
-                const linePoints = getPointsOfLine(cursorY);
+                const linePoints = getPointsOfLineUnsafe(cursorY);
                 cursorX = linePoints.endIndex - linePoints.startIndex + 1;
             }
         }
         else if (event.key === 'ArrowUp') {
             if (cursorY > 0) {
-                const linePointsPrev = getPointsOfLine(--cursorY);
+                const linePointsPrev = getPointsOfLineUnsafe(--cursorY);
                 if (cursorX > linePointsPrev.endIndex - linePointsPrev.startIndex) {
                     cursorX = linePointsPrev.endIndex - linePointsPrev.startIndex;
                 }
@@ -219,13 +242,24 @@ onDomReady(() => {
         updateCursor();
     });
     setTimeout(() => {
+        offsetTop = editor.offsetTop;
+        offsetLeft = editor.offsetLeft;
         renderCode();
         updateCursor();
     }, 500);
     console.log('after');
 });
+function getPointsOfLastLine() {
+    return getPointsOfLineUnsafe((editor.children.length / 2 - 1));
+}
+function getPointsOfLineUnsafe(lineNumber) {
+    return getPointsOfLine(lineNumber);
+}
 function getPointsOfLine(lineNumber) {
     const line = editor.children[lineNumber * 2 + 1];
+    if (!line) {
+        return undefined;
+    }
     return {
         startIndex: parseInt(line.dataset.startIndex),
         endIndex: parseInt(line.dataset.endIndex)
@@ -302,6 +336,7 @@ function getLineNumberWith() {
 }
 function updateCursor() {
     const lineNumberWith = getLineNumberWith();
+    console.log(lineNumberWith, offsetLeft);
     cursor.style.top = `${offsetTop + cursorY * fontHeight}px`;
     cursor.style.left = `${offsetLeft + lineNumberWith - fontLength / 2 + cursorX * fontLength}px`;
 }
