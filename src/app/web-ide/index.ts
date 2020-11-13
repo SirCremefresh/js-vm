@@ -83,7 +83,10 @@ onDomReady(() => {
   fontHeight = fontSize * fontHeightScaling;
 
   runControl.addEventListener('click', event => {
-    const vm = new Vm(generateCode(programText));
+    const vm = new Vm(generateCode(programText), (message) => {
+
+      console.log(`this is cool message: ${message}`);
+    });
     try {
       vm.run();
     } catch (e) {

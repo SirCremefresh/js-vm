@@ -51,9 +51,7 @@ export function renderCodeToEditor(programText: string, editor: HTMLElement): vo
   if (lines.length > 0) {
     editor.append(...lines);
   }
-  console.timeEnd('render');
 }
-
 
 function createSpanWithContent(className: string, content: string, startIndex: number, endIndex: number): HTMLSpanElement {
   const span = document.createElement('span');

@@ -1,11 +1,11 @@
-import {Instruction, InstructionMap} from './instructions';
-import {VmState} from './vm-state';
+import { Instruction, InstructionMap } from './instructions';
+import { VmState } from './vm-state';
 
 export class Vm {
   public readonly vmState: VmState;
 
-  constructor(instructions: Int32Array) {
-    this.vmState = new VmState(instructions);
+  constructor(instructions: Int32Array, stdOut: ((message: number) => void) | null = null) {
+    this.vmState = new VmState(instructions, stdOut);
   }
 
   public run(): number {
