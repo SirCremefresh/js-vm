@@ -81,6 +81,18 @@ onDomReady(() => {
     const lineNumberWith = getLineNumberWith();
     cursorX = Math.floor((clientX - offsetLeft - lineNumberWith) / fontLength);
     cursorY = Math.floor((clientY - offsetTop) / fontHeight);
+    cursorX = cursorX > 0 ? cursorX : 0;
+    cursorY = cursorY > 0 ? cursorY : 0;
+
+    const line = getLineElement(cursorY);
+    if (line) {
+
+      console.log();
+      console.log(cursorY);
+      console.log(cursorX);
+    }
+
+
     updateCursor();
   });
 
@@ -242,6 +254,14 @@ function renderCode() {
     editor.append(...lines);
   }
   console.timeEnd('render');
+}
+
+function getLineElement(lineNumber: number): HTMLElement | null {
+  const index = lineNumber * 2 + 1;
+  if (index >= editor.children.length) {
+    return null;
+  }
+  return editor.children[index] as HTMLElement;
 }
 
 function createSpanWithContent(className: string, content: string, startIndex: number, endIndex: number): HTMLSpanElement {
