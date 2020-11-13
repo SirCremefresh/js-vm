@@ -152,6 +152,7 @@ let editorPanel;
 let cursor;
 let offsetTop = 0;
 let offsetLeft = 0;
+let editorFocused = true;
 // large text for testing
 // let programText = new Array(50)
 //   .fill('a')
@@ -178,6 +179,15 @@ function eventHasParent(event, parent) {
     } while (checkingElement !== null);
     return false;
 }
+function setEditorFocused(focused) {
+    if (focused) {
+        editorPanel.classList.add('focused');
+    }
+    else {
+        editorPanel.classList.remove('focused');
+    }
+    editorFocused = focused;
+}
 onDomReady(() => {
     editor = document.getElementById('editor');
     editorPanel = document.querySelector('.editor-panel');
@@ -189,8 +199,10 @@ onDomReady(() => {
     console.log({ fontSize, fontLength, fontHeight });
     document.addEventListener('click', event => {
         if (!eventHasParent(event, editorPanel)) {
+            setEditorFocused(false);
             return;
         }
+        setEditorFocused(true);
         const { clientX, clientY } = event;
         const lineNumberWith = getLineNumberWith();
         cursorX = Math.floor((clientX - offsetLeft - lineNumberWith) / fontLength);
@@ -210,6 +222,9 @@ onDomReady(() => {
         updateCursor();
     });
     document.addEventListener('keydown', event => {
+        if (!editorFocused) {
+            return false;
+        }
         if (event.key !== 'F5') {
             event.preventDefault();
         }
@@ -312,8 +327,8 @@ onDomReady(() => {
         offsetLeft = editor.offsetLeft;
         renderCodeToEditor(programText, editor);
         updateCursor();
+        setEditorFocused(true);
     }, 500);
-    console.log('after');
 });
 function getPointsOfLastLine() {
     return getPointsOfLineUnsafe((editor.children.length / 2 - 1));
