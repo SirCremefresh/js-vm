@@ -84,12 +84,11 @@ onDomReady(() => {
     cursorX = cursorX > 0 ? cursorX : 0;
     cursorY = cursorY > 0 ? cursorY : 0;
 
-    const line = getLineElement(cursorY);
-    if (line) {
-
-      console.log();
-      console.log(cursorY);
-      console.log(cursorX);
+    const line = getPointsOfLine(cursorY);
+    if (!line) {
+      const lastLine = getPointsOfLastLine();
+      cursorY = editor.children.length / 2 - 1;
+      cursorX = lastLine.endIndex - lastLine.startIndex + 1;
     }
 
 
@@ -103,24 +102,24 @@ onDomReady(() => {
 
     if (event.key.length === 1) {
       const character = (event.key !== ' ') ? event.key : ' ';
-      const linePoints = getPointsOfLine(cursorY);
+      const linePoints = getPointsOfLineUnsafe(cursorY);
       programText = programText.slice(0, cursorX + linePoints.startIndex) + character + programText.slice(cursorX + linePoints.startIndex);
       cursorX++;
       renderCode();
     } else if (event.key === 'Backspace') {
-      const linePoints = getPointsOfLine(cursorY);
+      const linePoints = getPointsOfLineUnsafe(cursorY);
       if (cursorX > 0) {
         programText = programText.slice(0, cursorX + linePoints.startIndex - 1) + programText.slice(cursorX + linePoints.startIndex);
         cursorX--;
       } else if (cursorY > 0) {
-        const linePointsPrev = getPointsOfLine(cursorY - 1);
+        const linePointsPrev = getPointsOfLineUnsafe(cursorY - 1);
         programText = programText.slice(0, cursorX + linePoints.startIndex - 1) + programText.slice(cursorX + linePoints.startIndex);
         cursorX = linePointsPrev.endIndex - linePointsPrev.startIndex;
         cursorY--;
       }
       renderCode();
     } else if (event.key === 'Delete') {
-      const linePoints = getPointsOfLine(cursorY);
+      const linePoints = getPointsOfLineUnsafe(cursorY);
       programText = programText.slice(0, cursorX + linePoints.startIndex) + programText.slice(cursorX + linePoints.startIndex + 1);
       renderCode();
     } else if (event.key === 'Enter') {
@@ -132,7 +131,7 @@ onDomReady(() => {
       cursorX = 0;
       renderCode();
     } else if (event.key === 'ArrowRight') {
-      const linePoints = getPointsOfLine(cursorY);
+      const linePoints = getPointsOfLineUnsafe(cursorY);
 
       if (cursorX < linePoints.endIndex - linePoints.startIndex) {
         cursorX++;
@@ -150,7 +149,7 @@ onDomReady(() => {
         cursorX--;
       } else {
         if (cursorY > 0) {
-          const linePoints = getPointsOfLine(cursorY - 1);
+          const linePoints = getPointsOfLineUnsafe(cursorY - 1);
           cursorX = linePoints.endIndex - linePoints.startIndex;
           cursorY--;
         }
@@ -158,17 +157,17 @@ onDomReady(() => {
     } else if (event.key === 'ArrowDown') {
       const lineCount = getRenderedLineCount();
       if (cursorY < lineCount - 1) {
-        const linePointsNext = getPointsOfLine(++cursorY);
+        const linePointsNext = getPointsOfLineUnsafe(++cursorY);
         if (cursorX > linePointsNext.endIndex - linePointsNext.startIndex) {
           cursorX = linePointsNext.endIndex - linePointsNext.startIndex;
         }
       } else {
-        const linePoints = getPointsOfLine(cursorY);
+        const linePoints = getPointsOfLineUnsafe(cursorY);
         cursorX = linePoints.endIndex - linePoints.startIndex + 1;
       }
     } else if (event.key === 'ArrowUp') {
       if (cursorY > 0) {
-        const linePointsPrev = getPointsOfLine(--cursorY);
+        const linePointsPrev = getPointsOfLineUnsafe(--cursorY);
         if (cursorX > linePointsPrev.endIndex - linePointsPrev.startIndex) {
           cursorX = linePointsPrev.endIndex - linePointsPrev.startIndex;
         }
@@ -189,8 +188,19 @@ onDomReady(() => {
   console.log('after');
 });
 
-function getPointsOfLine(lineNumber: number): { startIndex: number, endIndex: number } {
-  const line = editor.children[lineNumber * 2 + 1] as HTMLElement;
+function getPointsOfLastLine(): { startIndex: number, endIndex: number } {
+  return getPointsOfLineUnsafe((editor.children.length / 2 - 1)) as { startIndex: number, endIndex: number };
+}
+
+function getPointsOfLineUnsafe(lineNumber: number): { startIndex: number, endIndex: number } {
+  return getPointsOfLine(lineNumber) as { startIndex: number, endIndex: number };
+}
+
+function getPointsOfLine(lineNumber: number): { startIndex: number, endIndex: number } | undefined {
+  const line = editor.children[lineNumber * 2 + 1] as HTMLElement | undefined;
+  if (!line) {
+    return undefined;
+  }
   return {
     startIndex: parseInt(line.dataset.startIndex as string),
     endIndex: parseInt(line.dataset.endIndex as string)
@@ -254,14 +264,6 @@ function renderCode() {
     editor.append(...lines);
   }
   console.timeEnd('render');
-}
-
-function getLineElement(lineNumber: number): HTMLElement | null {
-  const index = lineNumber * 2 + 1;
-  if (index >= editor.children.length) {
-    return null;
-  }
-  return editor.children[index] as HTMLElement;
 }
 
 function createSpanWithContent(className: string, content: string, startIndex: number, endIndex: number): HTMLSpanElement {
