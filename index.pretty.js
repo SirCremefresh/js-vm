@@ -70,6 +70,214 @@ function getTokenStream(programText) {
     return context.tokenStream;
 }
 
+function getCodeFromToken(tokenElement, generatorState) {
+    return generatorState.programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1);
+}
+function panic(message) {
+    console.error(message);
+    process.exit(1);
+}
+function parseRegistry(regString) {
+    switch (regString) {
+        case '%ra':
+            return 0 /* A */;
+        case '%rb':
+            return 1 /* B */;
+        case '%rc':
+            return 2 /* C */;
+        case '%rd':
+            return 3 /* D */;
+        default:
+            panic(`Register is not known: ${regString}`);
+    }
+}
+const InstructionHandlers = {
+    push: (generatorState) => {
+        const [, constant] = generatorState.line;
+        return [1 /* INSTRUCTION_PUSH */, parseInt(getCodeFromToken(constant, generatorState))];
+    },
+    load: (generatorState) => {
+        const [, par1] = generatorState.line;
+        return [4 /* INSTRUCTION_LOAD */, parseRegistry(getCodeFromToken(par1, generatorState))];
+    },
+    log: (generatorState) => {
+        const [, par1] = generatorState.line;
+        return [2 /* INSTRUCTION_LOG */, parseRegistry(getCodeFromToken(par1, generatorState))];
+    },
+    inc: (generatorState) => {
+        const [, par1, par2] = generatorState.line;
+        return [5 /* INSTRUCTION_INC */, parseRegistry(getCodeFromToken(par1, generatorState)), parseInt(getCodeFromToken(par2, generatorState))];
+    },
+    jl: (generatorState) => {
+        const [, par1] = generatorState.line;
+        return [8 /* INSTRUCTION_JL */, getCodeFromToken(par1, generatorState)];
+    },
+    halt: (generatorState) => {
+        return [0 /* INSTRUCTION_HALT */];
+    }
+};
+function isInstruction(code) {
+    return code in InstructionHandlers;
+}
+function inlineLabelRefrences(generatorState) {
+    for (let i = 0; i < generatorState.result.length; i++) {
+        if (typeof generatorState.result[i] === 'string') {
+            const labelIndex = generatorState.labelMap.get(generatorState.result[i]);
+            if (!labelIndex) {
+                panic(`Label not found. labelk: ${generatorState.result[i]}`);
+            }
+            generatorState.result[i] = labelIndex;
+        }
+    }
+    return generatorState;
+}
+function processLine(generatorState) {
+    const [firstToken] = generatorState.line;
+    if (firstToken.token === "TOKEN_INSTRUCTION" /* TOKEN_INSTRUCTION */) {
+        const instructionCode = getCodeFromToken(firstToken, generatorState);
+        if (isInstruction(instructionCode)) {
+            generatorState.result.push(...InstructionHandlers[instructionCode](generatorState));
+        }
+        else {
+            panic(`Instruction not recognised: ${instructionCode}. location: ${firstToken.startIndex}`);
+        }
+        generatorState.line = [];
+    }
+    else if (firstToken.token === "TOKEN_LABEL" /* TOKEN_LABEL */) {
+        const code = getCodeFromToken(firstToken, generatorState).slice(0, -1);
+        generatorState.labelMap.set(code, generatorState.result.length);
+        generatorState.result.push(9 /* INSTRUCTION_LABEL */);
+        generatorState.line = [];
+    }
+    else if (firstToken.token !== "TOKEN_COMMENT" /* TOKEN_COMMENT */) {
+        panic(`Line needs to start with Instruction or Comment code: ${firstToken}. location: ${firstToken.startIndex}`);
+    }
+    return generatorState;
+}
+function generateCode(programText) {
+    let generatorState = {
+        result: [],
+        line: [],
+        labelMap: new Map(),
+        programText
+    };
+    const tokenStream = getTokenStream(programText);
+    const ignorableTokens = ["TOKEN_WHITESPACE" /* TOKEN_WHITESPACE */, "TOKEN_COMMENT" /* TOKEN_COMMENT */, "TOKEN_COMMA" /* TOKEN_COMMA */];
+    for (const tokenElement of tokenStream) {
+        if (ignorableTokens.includes(tokenElement.token)) {
+            continue;
+        }
+        if (tokenElement.token !== "TOKEN_NEWLINE" /* TOKEN_NEWLINE */) {
+            generatorState.line.push(tokenElement);
+            continue;
+        }
+        if (generatorState.line.length === 0) {
+            continue;
+        }
+        generatorState = processLine(generatorState);
+    }
+    if (generatorState.line.length > 0) {
+        generatorState = processLine(generatorState);
+    }
+    generatorState = inlineLabelRefrences(generatorState);
+    return Int32Array.from(generatorState.result);
+}
+
+function add(vmState) {
+    vmState.registers[0 /* A */] = vmState.nextInstruction();
+    vmState.registers[1 /* B */] = vmState.nextInstruction();
+    vmState.registers[2 /* C */] = vmState.registers[0 /* A */] + vmState.registers[1 /* B */];
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function halt(vmState) {
+    console.log('halt');
+}
+
+function inc(vmState) {
+    vmState.registers[vmState.nextInstruction()] += vmState.nextInstruction();
+}
+
+function jmp(vmState) {
+    const instruction = vmState.nextInstruction();
+    vmState.instructionIndex = instruction;
+}
+
+function jl(vmState) {
+    if (vmState.registers[2 /* C */] >= vmState.registers[3 /* D */]) {
+        vmState.instructionIndex++;
+        return;
+    }
+    jmp(vmState);
+}
+
+function jle(vmState) {
+    if (vmState.registers[2 /* C */] > vmState.registers[3 /* D */]) {
+        vmState.instructionIndex++;
+        return;
+    }
+    jmp(vmState);
+}
+
+function load(vmState) {
+    const stackValue = vmState.stack.pop();
+    vmState.registers[vmState.nextInstruction()] = stackValue;
+}
+
+function log(vmState) {
+    console.log(vmState.registers[vmState.nextInstruction()]);
+}
+
+function push(vmState) {
+    vmState.stack.push(vmState.nextInstruction());
+}
+
+const InstructionMap = {
+    [0 /* INSTRUCTION_HALT */]: halt,
+    [1 /* INSTRUCTION_PUSH */]: push,
+    [2 /* INSTRUCTION_LOG */]: log,
+    [3 /* INSTRUCTION_ADD */]: add,
+    [4 /* INSTRUCTION_LOAD */]: load,
+    [5 /* INSTRUCTION_INC */]: inc,
+    [6 /* INSTRUCTION_JMP */]: jmp,
+    [7 /* INSTRUCTION_JLE */]: jle,
+    [8 /* INSTRUCTION_JL */]: jl,
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-unused-vars
+    [10 /* INSTRUCTION_NOP */]: function (_) {
+        return null;
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-unused-vars
+    [9 /* INSTRUCTION_LABEL */]: function (_) {
+        return null;
+    },
+};
+
+class VmState {
+    constructor(instructions) {
+        this.stack = [];
+        this.registers = new Int32Array(4 /* REGISTER_LENGTH */);
+        this.instructionIndex = 0;
+        this.instructions = instructions;
+    }
+    nextInstruction() {
+        return this.instructions[this.instructionIndex++];
+    }
+}
+
+class Vm {
+    constructor(instructions) {
+        this.vmState = new VmState(instructions);
+    }
+    run() {
+        let instruction;
+        do {
+            instruction = this.vmState.instructions[this.vmState.instructionIndex++];
+            InstructionMap[instruction](this.vmState);
+        } while (instruction !== 0 /* INSTRUCTION_HALT */);
+        return 0;
+    }
+}
+
 const tokenToClassNameMap = {
     ["TOKEN_INSTRUCTION" /* TOKEN_INSTRUCTION */]: 'instruction',
     ["TOKEN_CONST" /* TOKEN_CONST */]: 'const',
@@ -150,6 +358,7 @@ let cursorY = 0;
 let editor;
 let editorPanel;
 let cursor;
+let runControl;
 let offsetTop = 0;
 let offsetLeft = 0;
 let editorFocused = true;
@@ -192,11 +401,21 @@ onDomReady(() => {
     editor = document.getElementById('editor');
     editorPanel = document.querySelector('.editor-panel');
     cursor = document.querySelector('.cursor');
+    runControl = document.getElementById('control-run');
     const fontSize = parseInt(getComputedStyle(document.documentElement)
         .getPropertyValue('--editor-font-size'));
     fontLength = fontSize * fontLengthScaling;
     fontHeight = fontSize * fontHeightScaling;
-    console.log({ fontSize, fontLength, fontHeight });
+    runControl.addEventListener('click', event => {
+        const vm = new Vm(generateCode(programText));
+        try {
+            vm.run();
+        }
+        catch (e) {
+            console.log('error');
+            console.log(vm.vmState);
+        }
+    });
     document.addEventListener('click', event => {
         if (!eventHasParent(event, editorPanel)) {
             setEditorFocused(false);
@@ -354,7 +573,6 @@ function getLineNumberWith() {
 }
 function updateCursor() {
     const lineNumberWith = getLineNumberWith();
-    console.log(lineNumberWith, offsetLeft);
     cursor.style.top = `${offsetTop + cursorY * fontHeight}px`;
     cursor.style.left = `${offsetLeft + lineNumberWith - fontLength / 2 + cursorX * fontLength}px`;
 }
