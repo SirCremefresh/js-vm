@@ -1,3 +1,5 @@
+import { generateCode } from '../../lib/code-generator/index';
+import { Vm } from '../../lib/vm-runtime/index';
 import { renderCodeToEditor } from './renderer';
 
 function onDomReady(fn: () => void) {
@@ -20,6 +22,7 @@ let cursorY = 0;
 let editor: HTMLElement;
 let editorPanel: HTMLElement;
 let cursor: HTMLElement;
+let runControl: HTMLElement;
 
 let offsetTop = 0;
 let offsetLeft = 0;
@@ -69,6 +72,7 @@ onDomReady(() => {
   editor = document.getElementById('editor') as HTMLElement;
   editorPanel = document.querySelector('.editor-panel') as HTMLElement;
   cursor = document.querySelector('.cursor') as HTMLElement;
+  runControl = document.getElementById('control-run') as HTMLElement;
 
   const fontSize = parseInt(
     getComputedStyle(document.documentElement)
@@ -78,7 +82,15 @@ onDomReady(() => {
   fontLength = fontSize * fontLengthScaling;
   fontHeight = fontSize * fontHeightScaling;
 
-  console.log({ fontSize, fontLength, fontHeight });
+  runControl.addEventListener('click', event => {
+    const vm = new Vm(generateCode(programText));
+    try {
+      vm.run();
+    } catch (e) {
+      console.log('error');
+      console.log(vm.vmState);
+    }
+  });
 
   document.addEventListener('click', event => {
     if (!eventHasParent(event, editorPanel)) {
@@ -236,7 +248,6 @@ function getLineNumberWith() {
 
 function updateCursor() {
   const lineNumberWith = getLineNumberWith();
-  console.log(lineNumberWith, offsetLeft);
   cursor.style.top = `${offsetTop + cursorY * fontHeight}px`;
   cursor.style.left = `${offsetLeft + lineNumberWith - fontLength / 2 + cursorX * fontLength}px`;
 }
