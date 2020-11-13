@@ -362,6 +362,7 @@ let editor;
 let editorPanel;
 let cursor;
 let runControl;
+let consoleElement;
 let offsetTop = 0;
 let offsetLeft = 0;
 let editorFocused = true;
@@ -370,7 +371,7 @@ let editorFocused = true;
 //   .fill('a')
 //   .map(v => Array(20).fill(v).join(' '))
 //   .join('\n');
-let programText = `push 100
+let programText = `push 10
 load %rd
 log %rd
 loop_start:
@@ -405,20 +406,27 @@ onDomReady(() => {
     editorPanel = document.querySelector('.editor-panel');
     cursor = document.querySelector('.cursor');
     runControl = document.getElementById('control-run');
+    consoleElement = document.getElementById('console');
     const fontSize = parseInt(getComputedStyle(document.documentElement)
         .getPropertyValue('--editor-font-size'));
     fontLength = fontSize * fontLengthScaling;
     fontHeight = fontSize * fontHeightScaling;
     runControl.addEventListener('click', event => {
+        while (consoleElement.firstChild) {
+            consoleElement.removeChild(consoleElement.firstChild);
+        }
         const vm = new Vm(generateCode(programText), (message) => {
-            console.log(`this is cool message: ${message}`);
+            const span = document.createElement('span');
+            span.textContent = message.toString();
+            consoleElement.append(span);
         });
         try {
             vm.run();
         }
         catch (e) {
-            console.log('error');
-            console.log(vm.vmState);
+            const span = document.createElement('span');
+            span.textContent = `Error: ${e}`;
+            consoleElement.append(span);
         }
     });
     document.addEventListener('click', event => {

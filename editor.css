@@ -1,7 +1,6 @@
 .editor-panel {
     background: var(--color-primary);
     padding: 15px;
-    border-radius: 5px;
 }
 
 .editor-panel.focused {
