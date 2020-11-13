@@ -89,6 +89,9 @@ onDomReady(() => {
       const lastLine = getPointsOfLastLine();
       cursorY = editor.children.length / 2 - 1;
       cursorX = lastLine.endIndex - lastLine.startIndex + 1;
+    } else {
+      const maxX = line.endIndex - line.startIndex;
+      cursorX = cursorX < maxX ? cursorX : maxX;
     }
 
 
