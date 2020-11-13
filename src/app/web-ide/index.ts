@@ -24,6 +24,8 @@ let cursor: HTMLElement;
 let offsetTop = 0;
 let offsetLeft = 0;
 
+let editorFocused = true;
+
 // large text for testing
 // let programText = new Array(50)
 //   .fill('a')
@@ -54,6 +56,15 @@ function eventHasParent(event: Event, parent: HTMLElement) {
   return false;
 }
 
+function setEditorFocused(focused: boolean) {
+  if (focused) {
+    editorPanel.classList.add('focused');
+  } else {
+    editorPanel.classList.remove('focused');
+  }
+  editorFocused = focused;
+}
+
 onDomReady(() => {
   editor = document.getElementById('editor') as HTMLElement;
   editorPanel = document.querySelector('.editor-panel') as HTMLElement;
@@ -71,8 +82,10 @@ onDomReady(() => {
 
   document.addEventListener('click', event => {
     if (!eventHasParent(event, editorPanel)) {
+      setEditorFocused(false);
       return;
     }
+    setEditorFocused(true);
 
     const { clientX, clientY } = event;
     const lineNumberWith = getLineNumberWith();
@@ -96,6 +109,9 @@ onDomReady(() => {
   });
 
   document.addEventListener('keydown', event => {
+    if (!editorFocused) {
+      return false;
+    }
     if (event.key !== 'F5') {
       event.preventDefault();
     }
@@ -187,8 +203,8 @@ onDomReady(() => {
 
     renderCodeToEditor(programText, editor);
     updateCursor();
+    setEditorFocused(true);
   }, 500);
-  console.log('after');
 });
 
 function getPointsOfLastLine(): { startIndex: number, endIndex: number } {

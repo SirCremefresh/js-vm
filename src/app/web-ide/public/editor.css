@@ -3,6 +3,12 @@
     padding: 15px;
     border-radius: 5px;
 }
+
+.editor-panel.focused {
+    border: 1px solid #525252;
+    padding: 14px;
+}
+
 .editor {
     background: var(--color-primary);
     display: grid;
@@ -39,12 +45,16 @@
     color: mintcream;
     position: absolute;
     font-weight: bold;
-    display: block;
     width: 0;
     text-align: left;
     left: 0;
-    animation: 1s blink step-end infinite;
     user-select: none;
+    display: none;
+}
+
+.editor-panel.focused .cursor {
+    display: block;
+    animation: 1s blink step-end infinite;
 }
 
 @keyframes blink {
