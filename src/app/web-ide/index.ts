@@ -1,5 +1,4 @@
-import { getTokenStream, Token } from '../../lib/lexer/index';
-import { TokenElement } from '../../lib/lexer/lexer';
+import { getTokenStream, Token, TokenElement } from '../../lib/lexer/index';
 
 function onDomReady(fn: () => void) {
   if (document.readyState === 'complete' || document.readyState === 'interactive') {

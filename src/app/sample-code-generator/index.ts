@@ -1,5 +1,5 @@
-import { getTokenStream, Token, TokenElement } from '../../lib/lexer/lexer';
-import { Instruction, Register, Vm } from '../../lib/vm-runtime';
+import { getTokenStream, Token, TokenElement } from '../../lib/lexer/index';
+import { Instruction, Register, Vm } from '../../lib/vm-runtime/index';
 
 function getCodeFromToken(tokenElement: TokenElement): string {
   return programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1);
