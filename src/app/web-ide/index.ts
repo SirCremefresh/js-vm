@@ -1,4 +1,4 @@
-import { getTokenStream, Token, TokenElement } from '../../lib/lexer/index';
+import { renderCodeToEditor } from './renderer';
 
 function onDomReady(fn: () => void) {
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -38,8 +38,6 @@ inc %rc, 1
 log %rc
 jl loop_start
 halt`;
-
-let tokenStream: TokenElement[];
 
 function eventHasParent(event: Event, parent: HTMLElement) {
   if (event.target === null || !(event.target instanceof HTMLElement)) {
@@ -101,13 +99,13 @@ onDomReady(() => {
     if (event.key !== 'F5') {
       event.preventDefault();
     }
-
+    let needsRender = false;
     if (event.key.length === 1) {
       const character = (event.key !== ' ') ? event.key : ' ';
       const linePoints = getPointsOfLineUnsafe(cursorY);
       programText = programText.slice(0, cursorX + linePoints.startIndex) + character + programText.slice(cursorX + linePoints.startIndex);
       cursorX++;
-      renderCode();
+      needsRender = true;
     } else if (event.key === 'Backspace') {
       const linePoints = getPointsOfLineUnsafe(cursorY);
       if (cursorX > 0) {
@@ -119,11 +117,11 @@ onDomReady(() => {
         cursorX = linePointsPrev.endIndex - linePointsPrev.startIndex;
         cursorY--;
       }
-      renderCode();
+      needsRender = true;
     } else if (event.key === 'Delete') {
       const linePoints = getPointsOfLineUnsafe(cursorY);
       programText = programText.slice(0, cursorX + linePoints.startIndex) + programText.slice(cursorX + linePoints.startIndex + 1);
-      renderCode();
+      needsRender = true;
     } else if (event.key === 'Enter') {
       const lines = programText.split('\n');
       const line = lines[cursorY];
@@ -131,7 +129,7 @@ onDomReady(() => {
       programText = lines.join('\n');
       cursorY++;
       cursorX = 0;
-      renderCode();
+      needsRender = true;
     } else if (event.key === 'ArrowRight') {
       const linePoints = getPointsOfLineUnsafe(cursorY);
 
@@ -179,12 +177,15 @@ onDomReady(() => {
     }
     console.log(event.key);
     updateCursor();
+    if (needsRender) {
+      renderCodeToEditor(programText, editor);
+    }
   });
   setTimeout(() => {
     offsetTop = editor.offsetTop;
     offsetLeft = editor.offsetLeft;
 
-    renderCode();
+    renderCodeToEditor(programText, editor);
     updateCursor();
   }, 500);
   console.log('after');
@@ -211,76 +212,6 @@ function getPointsOfLine(lineNumber: number): { startIndex: number, endIndex: nu
 
 function getRenderedLineCount(): number {
   return editor.children.length / 2;
-}
-
-const tokenToClassNameMap: { [key: string]: string } = {
-  [Token.TOKEN_INSTRUCTION]: 'instruction',
-  [Token.TOKEN_CONST]: 'const',
-  [Token.TOKEN_REGISTER]: 'register',
-  [Token.TOKEN_COMMENT]: 'comment'
-};
-
-function renderCode() {
-  console.time('render');
-  tokenStream = getTokenStream(programText);
-
-  while (editor.firstChild) {
-    editor.removeChild(editor.firstChild);
-  }
-  let lineNumber = 1;
-  let line;
-  const lines = [];
-  for (const tokenElement of tokenStream) {
-    if (!line) {
-      lines.push(createSpanWithContent('line-number', `${lineNumber}:`, tokenElement.startIndex, tokenElement.startIndex));
-      line = createDiv('line');
-      line.dataset.startIndex = tokenElement.startIndex.toString();
-      lineNumber++;
-    }
-
-    const tokenClass = tokenToClassNameMap[tokenElement.token];
-
-    if (tokenClass) {
-      line.appendChild(createSpanWithContent(tokenClass, programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1).replace(/\s/g, '\xa0'), tokenElement.startIndex, tokenElement.endIndex));
-    } else {
-      switch (tokenElement.token) {
-      case Token.TOKEN_NEWLINE:
-        line.dataset.endIndex = tokenElement.endIndex.toString();
-        lines.push(line);
-        line = null;
-        break;
-      case Token.TOKEN_WHITESPACE:
-        line.appendChild(createSpanWithContent(tokenClass, new Array(tokenElement.endIndex - tokenElement.startIndex + 2).join('\xa0'), tokenElement.startIndex, tokenElement.endIndex));
-        break;
-      default:
-        line.appendChild(createSpanWithContent('not-found', programText.slice(tokenElement.startIndex, tokenElement.endIndex + 1), tokenElement.startIndex, tokenElement.endIndex));
-      }
-    }
-  }
-  if (line) {
-    line.dataset.endIndex = tokenStream[tokenStream.length - 1].endIndex.toString();
-    lines.push(line);
-  }
-
-  if (lines.length > 0) {
-    editor.append(...lines);
-  }
-  console.timeEnd('render');
-}
-
-function createSpanWithContent(className: string, content: string, startIndex: number, endIndex: number): HTMLSpanElement {
-  const span = document.createElement('span');
-  span.classList.add(className);
-  span.textContent = content;
-  span.dataset.startIndex = startIndex.toString();
-  span.dataset.endIndex = endIndex.toString();
-  return span;
-}
-
-function createDiv(className: string): HTMLDivElement {
-  const div = document.createElement('div');
-  div.classList.add(className);
-  return div;
 }
 
 function getLineNumberWith() {
