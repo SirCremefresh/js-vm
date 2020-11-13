@@ -44,7 +44,7 @@
 
       .top-nav {
           grid-area: top-nav;
-
+          border-radius: 5px;
           background: var(--color-primary);
       }
 
@@ -57,12 +57,18 @@
 
       .console {
           grid-area: console;
-
+          border-radius: 5px;
           background: var(--color-primary);
+
+          display: flex;
+          flex-direction: column;
+          padding: 15px;
+          color: white;
       }
 
       .control-panel {
           grid-area: control-panel;
+          border-radius: 5px;
           background: var(--color-primary);
       }
 
@@ -74,6 +80,7 @@
 
       .editor-panel {
           grid-area: editor-panel;
+          border-radius: 5px;
       }
   </style>
 </head>
@@ -96,7 +103,8 @@
       <path d="M8 5v14l11-7z" />
     </svg>
   </div>
-  <div class="console">asdf</div>
+  <div class="console mono-font" id="console">
+  </div>
 </div>
 </body>
 </html>
