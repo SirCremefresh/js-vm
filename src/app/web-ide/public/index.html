@@ -35,9 +35,10 @@
           display: grid;
           grid-template-areas:
             "top-nav top-nav"
+            "editor-panel control-panel"
             "editor-panel console";
           grid-template-columns: 3fr 1fr;
-          grid-template-rows: var(--top-nav-height) 1fr;
+          grid-template-rows: var(--top-nav-height) 40px 1fr;
           grid-gap: 15px;
       }
 
@@ -60,6 +61,17 @@
           background: var(--color-primary);
       }
 
+      .control-panel {
+          grid-area: control-panel;
+          background: var(--color-primary);
+      }
+
+      .control-panel .run-icon {
+          fill: #006500;
+          height: 100%;
+          width: auto;
+      }
+
       .editor-panel {
           grid-area: editor-panel;
       }
@@ -76,6 +88,13 @@
     <span class="cursor mono-font" aria-selected="false">|</span>
     <div class="editor mono-font" id="editor">
     </div>
+  </div>
+  <div class="control-panel">
+    <svg class="run-icon" id="control-run"
+         xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+      <path d="M0 0h24v24H0z" fill="none" />
+      <path d="M8 5v14l11-7z" />
+    </svg>
   </div>
   <div class="console">asdf</div>
 </div>
